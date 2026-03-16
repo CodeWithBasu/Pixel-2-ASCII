@@ -27,9 +27,9 @@ export const Meteors = ({
   useEffect(() => {
     // Generate styles strictly on the client
     const styles = [...new Array(number)].map(() => ({
-      "--angle": angle + "deg",
-      top: -50 + Math.floor(Math.random() * (window.innerHeight / 2)) + "px", // Spaced across the top half
-      left: Math.floor(Math.random() * window.innerWidth * 1.5) + "px", // Started off-screen right
+      "--angle": "-65deg", // Steep angle pointing up-right so that -X translates down-left (top-right to bottom-left)
+      top: -50 + Math.floor(Math.random() * (window.innerHeight * 0.5)) + "px", // Spaced across the top half
+      left: Math.floor(Math.random() * window.innerWidth * 1.5) + "px", // Spaced mostly to the right to fall inwards
       animationDelay: Math.random() * (maxDelay - minDelay) + minDelay + "s",
       animationDuration: Math.floor(Math.random() * (maxDuration - minDuration) + minDuration) + "s",
     }))
@@ -49,7 +49,7 @@ export const Meteors = ({
           )}
         >
           {/* Meteor Tail */}
-          <div className="pointer-events-none absolute top-1/2 -z-10 h-px w-20 -translate-y-1/2 bg-gradient-to-r from-white to-transparent opacity-80" />
+          <div className="pointer-events-none absolute top-1/2 -z-10 h-px w-20 -translate-y-1/2 bg-linear-to-r from-white to-transparent opacity-80" />
         </span>
       ))}
     </>
