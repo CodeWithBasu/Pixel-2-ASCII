@@ -215,7 +215,7 @@
       opacity: 1;
     }
     100% {
-      transform: rotate(var(--angle)) translateX(-500px);
+      transform: rotate(var(--angle)) translateX(-150vw);
       opacity: 0;
     }
   }
