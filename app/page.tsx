@@ -3,18 +3,16 @@
 import type React from "react"
 import { useState, useRef, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { VideoToAsciiConverter } from "@/components/video-to-ascii-converter"
 import { ImageToAsciiConverter } from "@/components/image-to-ascii-converter"
 import { TerminalHeader } from "@/components/terminal-header"
-import { TerminalFrame } from "@/components/terminal-frame"
-import { Upload, Video, Image as ImageIcon, FileVideo } from "lucide-react"
+import { Upload, Video, Image as ImageIcon } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
 export default function HomePage() {
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
-  const [activeTab, setActiveTab] = useState("video")
+  const [activeMode, setActiveMode] = useState<"video" | "image">("image")
   
   const videoInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
@@ -23,6 +21,8 @@ export default function HomePage() {
     const file = event.target.files?.[0]
     if (file && file.type.startsWith("video/")) {
       setVideoFile(file)
+      setActiveMode("video")
+      setImageFile(null)
     }
   }, [])
 
@@ -30,16 +30,24 @@ export default function HomePage() {
     const file = event.target.files?.[0]
     if (file && file.type.startsWith("image/")) {
       setImageFile(file)
+      setActiveMode("image")
+      setVideoFile(null)
     }
   }, [])
 
-  const handleDrop = useCallback((event: React.DragEvent, type: "video" | "image") => {
+  const handleDrop = useCallback((event: React.DragEvent) => {
     event.preventDefault()
     const file = event.dataTransfer.files[0]
-    if (type === "video" && file && file.type.startsWith("video/")) {
-      setVideoFile(file)
-    } else if (type === "image" && file && file.type.startsWith("image/")) {
-      setImageFile(file)
+    if (file) {
+      if (file.type.startsWith("video/")) {
+        setVideoFile(file)
+        setActiveMode("video")
+        setImageFile(null)
+      } else if (file.type.startsWith("image/")) {
+        setImageFile(file)
+        setActiveMode("image")
+        setVideoFile(null)
+      }
     }
   }, [])
 
@@ -47,146 +55,100 @@ export default function HomePage() {
     event.preventDefault()
   }, [])
 
+  const resetAll = () => {
+    setVideoFile(null)
+    setImageFile(null)
+  }
+
   return (
-    <div className="min-h-screen bg-background text-foreground font-mono">
+    <div className="h-screen w-screen overflow-hidden bg-background text-foreground font-mono flex flex-col relative">
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(0,255,128,0.03)_0%,transparent_100%)] z-0"></div>
+      
       <TerminalHeader />
 
-      <main className="container mx-auto px-4 py-4 md:px-6 md:py-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <div className="max-w-6xl mx-auto space-y-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-border pb-6">
-            <div className="space-y-2">
-              <h1 className="text-3xl md:text-5xl font-mono tracking-tighter text-foreground font-bold">
-                PIXEL-2-ASCII <span className="text-primary text-sm align-top">V1.0</span>
-              </h1>
-              <p className="text-sm md:text-base text-muted-foreground font-mono max-w-xl">
-                Advanced conversion engine for transforming digital media into high-fidelity terminal art.
-              </p>
-            </div>
+      <main className="flex-1 overflow-hidden flex flex-col z-10 p-4">
+        <AnimatePresence mode="wait">
+          {(!videoFile && !imageFile) ? (
+            <motion.div 
+              key="upload"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              className="flex-1 flex flex-col items-center justify-center space-y-8 h-full"
+            >
+               <div className="text-center space-y-4 max-w-2xl relative">
+                  <div className="absolute -left-8 -top-8 w-16 h-16 border-t-2 border-l-2 border-primary/20"></div>
+                  <div className="absolute -right-8 -bottom-8 w-16 h-16 border-b-2 border-r-2 border-primary/20"></div>
+                  
+                  <h1 className="text-4xl md:text-6xl font-mono tracking-tighter text-foreground font-bold drop-shadow-[0_0_15px_rgba(0,255,128,0.3)]">
+                    PIXEL-2-ASCII <span className="text-primary text-sm align-top">SYS_V2.0</span>
+                  </h1>
+                  <p className="text-sm md:text-base text-muted-foreground font-mono">
+                    Advanced conversion engine. Drop digital media to initialize processing matrix.
+                  </p>
+               </div>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
-              <TabsList className="bg-muted/50 border border-border p-1 w-full md:w-auto">
-                <TabsTrigger value="video" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-mono text-xs uppercase tracking-widest px-6">
-                  <Video className="w-3 h-3 mr-2" /> Video
-                </TabsTrigger>
-                <TabsTrigger value="image" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-mono text-xs uppercase tracking-widest px-6">
-                  <ImageIcon className="w-3 h-3 mr-2" /> Image
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
-          </div>
+               <div 
+                  className="w-full max-w-3xl border border-primary/30 bg-card/10 backdrop-blur-md relative group cursor-pointer overflow-hidden rounded-sm"
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+               >
+                  <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  
+                  {/* Scanline decoration */}
+                  <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.25)_50%)] bg-size-[100%_4px] pointer-events-none opacity-20"></div>
 
-          <Tabs value={activeTab} className="w-full">
-            <TabsContent value="video" className="mt-0 space-y-6">
-              {!videoFile ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                  <Card
-                    className="group border-2 border-dashed border-border hover:border-primary/50 transition-all cursor-pointer bg-card/30 relative overflow-hidden"
-                    onDrop={(e) => handleDrop(e, "video")}
-                    onDragOver={handleDragOver}
-                    onClick={() => videoInputRef.current?.click()}
-                  >
-                    <div className="p-12 md:p-20 text-center space-y-6 relative z-10">
-                      <div className="w-16 h-16 mx-auto border border-border flex items-center justify-center group-hover:border-primary/50 transition-colors bg-background">
-                        <Upload className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
-                      </div>
-
+                  <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-primary/20 relative z-10">
+                    <div 
+                      className="p-12 md:p-16 text-center space-y-6 hover:bg-primary/10 transition-colors duration-300"
+                      onClick={() => imageInputRef.current?.click()}
+                    >
+                      <ImageIcon className="w-10 h-10 mx-auto text-primary animate-pulse" />
                       <div className="space-y-2">
-                        <h3 className="text-xl font-mono text-foreground font-bold">Inject Video Stream</h3>
-                        <p className="text-sm text-muted-foreground font-mono">
-                          Drag and drop source or click to browse.
-                          <br />
-                          <span className="text-[10px] opacity-50 uppercase tracking-tighter mt-2 inline-block">
-                            MP4 / WebM / MOV / AVI
-                          </span>
-                        </p>
+                        <h3 className="text-lg font-mono text-foreground font-bold uppercase tracking-widest">Image Frame</h3>
+                        <p className="text-xs text-muted-foreground">PNG / JPG / WEBP</p>
                       </div>
-
-                      <Button className="btn-terminal" variant="outline">
-                        Select Source
-                      </Button>
                     </div>
-                    <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <input ref={videoInputRef} type="file" accept="video/*" onChange={handleVideoSelect} className="hidden" />
-                  </Card>
-
-                  <Card className="border-border bg-card/30 p-1">
-                    <TerminalFrame title="LIVE_PREVIEW.SYS">
-                      <div className="aspect-video relative overflow-hidden bg-black flex items-center justify-center">
-                        <video
-                          className="w-full h-full object-cover opacity-60"
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                          style={{ imageRendering: "pixelated" }}
-                        >
-                          <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/RPReplay_Final1758943384-lFlOhPjiu0rgv5mbWLixF6xIQk8pUX.mov" type="video/mp4" />
-                        </video>
-                        <div className="absolute inset-0 flex items-center justify-center bg-background/20 backdrop-blur-[2px]">
-                          <div className="text-center space-y-2">
-                            <div className="text-[10px] text-primary font-mono uppercase tracking-[0.3em] animate-pulse">Running Sample</div>
-                            <div className="h-px w-12 bg-primary/50 mx-auto"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </TerminalFrame>
-                  </Card>
-                </div>
-              ) : (
-                <VideoToAsciiConverter videoFile={videoFile} onReset={() => setVideoFile(null)} />
-              )}
-            </TabsContent>
-
-            <TabsContent value="image" className="mt-0 space-y-6">
-              {!imageFile ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                  <Card
-                    className="group border-2 border-dashed border-border hover:border-primary/50 transition-all cursor-pointer bg-card/30 relative overflow-hidden"
-                    onDrop={(e) => handleDrop(e, "image")}
-                    onDragOver={handleDragOver}
-                    onClick={() => imageInputRef.current?.click()}
-                  >
-                    <div className="p-12 md:p-20 text-center space-y-6 relative z-10">
-                      <div className="w-16 h-16 mx-auto border border-border flex items-center justify-center group-hover:border-primary/50 transition-colors bg-background">
-                        <ImageIcon className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
-                      </div>
-
+                    
+                    <div 
+                      className="p-12 md:p-16 text-center space-y-6 hover:bg-primary/10 transition-colors duration-300"
+                      onClick={() => videoInputRef.current?.click()}
+                    >
+                      <Video className="w-10 h-10 mx-auto text-primary animate-pulse" />
                       <div className="space-y-2">
-                        <h3 className="text-xl font-mono text-foreground font-bold">Inject Static Frame</h3>
-                        <p className="text-sm text-muted-foreground font-mono">
-                          Upload image for conversion.
-                          <br />
-                          <span className="text-[10px] opacity-50 uppercase tracking-tighter mt-2 inline-block">
-                            PNG / JPG / WEBP / SVG
-                          </span>
-                        </p>
+                        <h3 className="text-lg font-mono text-foreground font-bold uppercase tracking-widest">Video Stream</h3>
+                        <p className="text-xs text-muted-foreground">MP4 / WEBM</p>
                       </div>
-
-                      <Button className="btn-terminal" variant="outline">
-                        Select Frame
-                      </Button>
                     </div>
-                    <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
-                  </Card>
+                  </div>
+               </div>
 
-                  <Card className="border-border bg-card/30 flex flex-col items-center justify-center p-12 space-y-6 text-center h-full">
-                    <div className="p-4 border border-border relative">
-                      <div className="absolute -top-2 -left-2 w-4 h-4 border-t-2 border-l-2 border-primary"></div>
-                      <div className="absolute -bottom-2 -right-2 w-4 h-4 border-b-2 border-r-2 border-primary"></div>
-                      <div className="text-4xl font-mono text-primary/20 opacity-50">IMAGE_MODULE</div>
-                    </div>
-                    <p className="text-xs text-muted-foreground font-mono uppercase tracking-widest max-w-[200px]">
-                      Static frame processing enabled. supports color mapping and character set selection.
-                    </p>
-                  </Card>
-                </div>
-              ) : (
-                <ImageToAsciiConverter imageFile={imageFile} onReset={() => setImageFile(null)} />
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
+               <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
+               <input ref={videoInputRef} type="file" accept="video/*" onChange={handleVideoSelect} className="hidden" />
+               
+               <div className="flex gap-4 opacity-50 text-xs uppercase tracking-widest pt-8">
+                  <span className="flex items-center"><div className="w-2 h-2 bg-primary mr-2"></div> Ready</span>
+                  <span className="flex items-center"><div className="w-2 h-2 bg-yellow-500 mr-2"></div> Auto-Detect</span>
+               </div>
+            </motion.div>
+          ) : (
+             <motion.div 
+               key="editor"
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="h-full flex flex-col overflow-hidden border border-border bg-card/20 rounded-sm"
+             >
+                {/* Embedded Converter with unified wrapper or passing mode */}
+                {activeMode === "image" && imageFile && (
+                  <ImageToAsciiConverter imageFile={imageFile} onReset={resetAll} />
+                )}
+                {activeMode === "video" && videoFile && (
+                  <VideoToAsciiConverter videoFile={videoFile} onReset={resetAll} />
+                )}
+             </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   )

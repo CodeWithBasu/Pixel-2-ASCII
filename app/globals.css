@@ -181,4 +181,23 @@
   .btn-terminal.active {
     @apply bg-primary text-primary-foreground border-primary;
   }
+
+  /* Custom HUD Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: oklch(0.2 0 0);
+    border-radius: 0;
+  }
+  .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+    background: oklch(0.4 0 0);
+  }
+  .custom-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }

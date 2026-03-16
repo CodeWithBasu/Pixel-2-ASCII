@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Slider } from "@/components/ui/slider"
+import { X, Video, Play, Square, Download, RefreshCw } from "lucide-react"
 
 interface VideoToAsciiConverterProps {
   videoFile: File
@@ -18,8 +18,8 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
   const [currentFrame, setCurrentFrame] = useState(0)
   const [isProcessing, setIsProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [width, setWidth] = useState([90])
-  const [fps, setFps] = useState([10])
+  const [width, setWidth] = useState([80])
+  const [fps, setFps] = useState([12])
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -27,7 +27,7 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
 
   const convertFrameToAscii = useCallback((imageData: ImageData, width: number) => {
     const { data } = imageData
-    const height = Math.floor((imageData.height * width) / imageData.width / 2)
+    const height = Math.floor((imageData.height * width) / imageData.width * 0.55) // Keep aspect ratio compensation
     let ascii = ""
 
     for (let y = 0; y < height; y++) {
@@ -54,18 +54,23 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
     if (asciiFrames.length === 0) return
 
     setIsPlaying(true)
-    setCurrentFrame(0)
+    
+    // Start from beginning if at the end
+    if (currentFrame >= asciiFrames.length - 1) {
+       setCurrentFrame(0)
+    }
 
     intervalRef.current = setInterval(() => {
       setCurrentFrame((prev) => {
         if (prev >= asciiFrames.length - 1) {
           setIsPlaying(false)
-          return 0
+          clearInterval(intervalRef.current)
+          return prev
         }
         return prev + 1
       })
     }, 1000 / fps[0])
-  }, [asciiFrames, fps])
+  }, [asciiFrames, fps, currentFrame])
 
   const stopAsciiVideo = useCallback(() => {
     setIsPlaying(false)
@@ -79,18 +84,37 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
 
     setIsProcessing(true)
     setProgress(0)
+    setAsciiFrames([])
+    setCurrentFrame(0)
+    stopAsciiVideo()
 
     const video = videoRef.current
     const canvas = canvasRef.current
-    const ctx = canvas.getContext("2d")
+    const ctx = canvas.getContext("2d", { willReadFrequently: true })
 
     if (!ctx) return
 
     const frames: string[] = []
     const duration = video.duration
+    
+    // Safety check for duration
+    if (isNaN(duration) || duration === 0) {
+        setIsProcessing(false)
+        return
+    }
+    
     const frameCount = Math.floor(duration * fps[0])
 
-    for (let i = 0; i < frameCount; i++) {
+    // Optimize: process sequentially without heavily blocking the main thread if possible
+    // For next-level this should move to a Web Worker, but for now we stagger with setTimeout
+    const processFrame = async (i: number) => {
+      if (i >= frameCount) {
+          setAsciiFrames(frames)
+          setIsProcessing(false)
+          setProgress(100)
+          return
+      }
+
       const time = (i / frameCount) * duration
       video.currentTime = time
 
@@ -107,12 +131,13 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
       frames.push(asciiFrame)
 
       setProgress(Math.floor((i / frameCount) * 100))
+      
+      // Let render cycle breathe
+      setTimeout(() => processFrame(i + 1), 0)
     }
 
-    setAsciiFrames(frames)
-    setIsProcessing(false)
-    setProgress(100)
-  }, [convertFrameToAscii, width, fps])
+    processFrame(0)
+  }, [convertFrameToAscii, width, fps, stopAsciiVideo])
 
   useEffect(() => {
     return () => {
@@ -126,86 +151,142 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
     if (videoFile && videoRef.current) {
       const url = URL.createObjectURL(videoFile)
       videoRef.current.src = url
+      // Trigger load to get duration
+      videoRef.current.load()
       return () => URL.revokeObjectURL(url)
     }
   }, [videoFile])
 
   useEffect(() => {
-    if (asciiFrames.length > 0 && !isProcessing) {
+    // Auto play when processing finishes
+    if (asciiFrames.length > 0 && !isProcessing && currentFrame === 0) {
       setTimeout(() => {
         playAsciiVideo()
       }, 500)
     }
-  }, [asciiFrames, isProcessing, playAsciiVideo])
+  }, [asciiFrames, isProcessing, playAsciiVideo, currentFrame])
+
+  const downloadAsTextSequence = () => {
+    // Basic export: all frames separated by a delimiter
+    const text = asciiFrames.join("\n===FRAME_BREAK===\n")
+    const blob = new Blob([text], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "pixel-2-ascii-video.txt"
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
   return (
-    <div className="space-y-8">
-      <Card className="border-border bg-card">
-        <div className="p-8 space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-mono tracking-wide text-foreground">Processing Controls</h2>
-            <div className="text-xs text-muted-foreground font-mono">{videoFile.name}</div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="space-y-3">
-              <label className="text-sm font-mono text-muted-foreground tracking-wide">
-                Width: {width[0]} characters
-              </label>
-              <Slider value={width} onValueChange={setWidth} min={40} max={120} step={10} className="w-full" />
+    <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border">
+      {/* Sidebar Controls - HUD style */}
+      <aside className="w-full md:w-80 lg:w-96 shrink-0 bg-background/50 flex flex-col h-full overflow-y-auto custom-scrollbar p-6">
+        <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-2 text-primary">
+                <Video className="w-5 h-5"/>
+                <h2 className="font-mono text-lg font-bold uppercase tracking-widest">Video Core</h2>
             </div>
-
-            <div className="space-y-3">
-              <label className="text-sm font-mono text-muted-foreground tracking-wide">Frame Rate: {fps[0]} fps</label>
-              <Slider value={fps} onValueChange={setFps} min={5} max={30} step={5} className="w-full" />
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-4 pt-4 border-t border-border">
-            <Button
-              onClick={processVideo}
-              disabled={isProcessing}
-              className="btn-terminal bg-transparent"
-              variant="outline"
-            >
-              {isProcessing ? `Processing ${progress}%` : "Convert to ASCII"}
+            <Button variant="ghost" size="icon" onClick={onReset} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                <X className="w-4 h-4"/>
             </Button>
-
-            {asciiFrames.length > 0 && (
-              <>
-                <Button
-                  onClick={isPlaying ? stopAsciiVideo : playAsciiVideo}
-                  className="btn-terminal bg-transparent"
-                  variant="outline"
-                >
-                  {isPlaying ? "Stop" : "Play"}
-                </Button>
-
-                <Button onClick={onReset} className="btn-terminal bg-transparent" variant="outline">
-                  Reset
-                </Button>
-              </>
-            )}
-          </div>
         </div>
-      </Card>
 
-      {asciiFrames.length > 0 && (
-        <Card className="border-border bg-card">
-          <div className="p-8 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-mono tracking-wide text-foreground">ASCII Output</h2>
-              <div className="text-sm font-mono text-muted-foreground">
-                Frame {currentFrame + 1} of {asciiFrames.length}
-              </div>
+        <div className="space-y-8 flex-1">
+            <div className="space-y-3">
+                <div className="flex justify-between items-center text-xs uppercase tracking-widest font-mono text-muted-foreground">
+                    <span>Resolution Width</span>
+                    <span className="text-primary">{width[0]} chars</span>
+                </div>
+                <Slider value={width} onValueChange={setWidth} min={40} max={120} step={4} className="py-2" disabled={isProcessing} />
             </div>
 
-            <div className="bg-background border border-border p-6 overflow-auto terminal-grid">
-              <pre className="ascii-art text-primary leading-none">{asciiFrames[currentFrame] || "No frame data"}</pre>
+            <div className="space-y-3">
+                <div className="flex justify-between items-center text-xs uppercase tracking-widest font-mono text-muted-foreground">
+                    <span>Target Extraction fps</span>
+                    <span className="text-primary">{fps[0]} fps</span>
+                </div>
+                <Slider value={fps} onValueChange={setFps} min={5} max={24} step={1} className="py-2" disabled={isProcessing} />
+                <p className="text-[10px] text-muted-foreground font-mono mt-1 leading-tight">Higher FPS exponentially increases processing time.</p>
             </div>
-          </div>
-        </Card>
-      )}
+
+            <div className="h-px bg-border/50 w-full my-4"></div>
+
+            <Button 
+                onClick={processVideo}
+                disabled={isProcessing}
+                className={`w-full btn-terminal h-12 uppercase tracking-widest ${isProcessing ? 'border-primary text-primary bg-primary/10' : ''}`}
+                variant="outline"
+            >
+                {isProcessing ? 'EXTRACTING FRAMES...' : 'INITIALIZE BUFFER'}
+            </Button>
+            
+            {isProcessing && (
+                <div className="space-y-2 mt-4">
+                    <div className="flex justify-between text-[10px] font-mono tracking-widest text-primary">
+                        <span>SYS.MEM.ALLOC</span>
+                        <span>{progress}%</span>
+                    </div>
+                    <div className="h-1 w-full bg-border overflow-hidden">
+                        <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progress}%` }}></div>
+                    </div>
+                    {/* Matrix-like decorative text */}
+                    <div className="text-[8px] font-mono text-primary/40 break-all leading-none opacity-50 overflow-hidden h-12">
+                        {Array(100).fill(0).map(() => Math.random().toString(36).substring(2, 3)).join('')}
+                    </div>
+                </div>
+            )}
+        </div>
+
+        {/* Action Panel */}
+        <div className="pt-6 border-t border-border mt-8 grid grid-cols-2 gap-3">
+            <Button onClick={isPlaying ? stopAsciiVideo : playAsciiVideo} disabled={asciiFrames.length === 0} variant="outline" className={`btn-terminal py-4 h-auto flex flex-col gap-2 rounded-none border-border/50 hover:border-primary ${isPlaying ? 'bg-primary/10 border-primary text-primary' : ''}`}>
+                {isPlaying ? <Square className="h-4 w-4" /> : <Play className="h-4 w-4 ml-1" />}
+                <span className="text-[10px] tracking-widest">{isPlaying ? 'HALT' : 'PLAY'}</span>
+            </Button>
+            <Button onClick={downloadAsTextSequence} disabled={asciiFrames.length === 0 || isProcessing} variant="outline" className="btn-terminal py-4 h-auto flex flex-col gap-2 rounded-none border-border/50 hover:border-primary">
+                <Download className="h-4 w-4" /> 
+                <span className="text-[10px] tracking-widest">EXPORT</span>
+            </Button>
+        </div>
+      </aside>
+
+      {/* Main ASCII Canvas Viewport */}
+      <main className="flex-1 bg-black overflow-hidden relative flex flex-col">
+        {/* Viewport Header */}
+        <div className="h-10 bg-[#0a0a0a] border-b border-border/50 flex items-center justify-between px-4 sticky top-0 z-20">
+            <div className="flex gap-2">
+                <div className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-primary animate-pulse' : 'bg-primary/30'}`}></div>
+                <div className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground ml-2">
+                    {asciiFrames.length > 0 ? `SEQ_${currentFrame + 1}/${asciiFrames.length}` : 'AWAITING_DATA'}
+                </div>
+            </div>
+            <div className="text-[10px] font-mono tracking-widest text-muted-foreground">
+                <span className="opacity-50 mr-2">{videoFile.name} //</span>
+                {videoRef.current ? `${videoRef.current.duration.toFixed(1)}s` : '0.0s'}
+            </div>
+        </div>
+        
+        {/* Terminal Text Area */}
+        <div className="flex-1 overflow-auto bg-black p-4 md:p-8 custom-scrollbar relative">
+             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-size-[20px_20px] pointer-events-none"></div>
+
+             {asciiFrames.length > 0 ? (
+                <div className="font-[Monaco,Consolas,monospace] text-primary text-[0.45rem] sm:text-[0.6rem] leading-[0.8] tracking-[0.02em] whitespace-pre mx-auto w-max pb-10">
+                  {asciiFrames[currentFrame]}
+                </div>
+              ) : (
+                <div className="h-full w-full flex items-center justify-center text-primary/50 font-mono text-sm tracking-widest">
+                  {isProcessing ? (
+                      <div className="flex flex-col items-center gap-4">
+                          <RefreshCw className="h-8 w-8 animate-spin" />
+                          <span>EXTRACTING_MATRIX_DATA</span>
+                      </div>
+                  ) : "SYSTEM_STANDBY"}
+                </div>
+              )}
+        </div>
+      </main>
 
       {/* Hidden processing elements */}
       <video ref={videoRef} className="hidden" muted preload="metadata" />

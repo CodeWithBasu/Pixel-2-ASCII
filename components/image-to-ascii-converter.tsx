@@ -2,12 +2,10 @@
 
 import { useState, useRef, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Copy, Download, Share2, RefreshCw } from "lucide-react"
+import { Copy, Download, Share2, RefreshCw, X, Image as ImageIcon } from "lucide-react"
 import { toast } from "sonner"
 
 interface ImageToAsciiConverterProps {
@@ -27,11 +25,12 @@ type CharSetKey = keyof typeof CHARACTER_SETS
 export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConverterProps) {
   const [asciiData, setAsciiData] = useState<{ char: string; color?: string }[][]>([])
   const [isProcessing, setIsProcessing] = useState(false)
-  const [width, setWidth] = useState([100])
+  const [width, setWidth] = useState([120])
   const [charSet, setCharSet] = useState<CharSetKey>("standard")
   const [invert, setInvert] = useState(false)
   const [grayscale, setGrayscale] = useState(false)
-  const [contrast, setContrast] = useState([0])
+  const [edgeDetect, setEdgeDetect] = useState(false) // New feature toggle
+  const [contrast, setContrast] = useState([20]) // Default boosted slightly for deeper ASCII feel
   const [brightness, setBrightness] = useState([0])
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -49,12 +48,11 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
 
     const aspect = img.height / img.width
     const targetWidth = width[0]
-    const targetHeight = Math.floor(targetWidth * aspect * 0.55) // 0.55 to compensate for font aspect ratio
+    const targetHeight = Math.floor(targetWidth * aspect * 0.55)
 
     canvas.width = targetWidth
     canvas.height = targetHeight
 
-    // Apply brightness and contrast filters
     ctx.filter = `brightness(${100 + brightness[0]}%) contrast(${100 + contrast[0]}%)`
     ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
 
@@ -70,6 +68,15 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
         let r = data[i]
         let g = data[i + 1]
         let b = data[i + 2]
+
+        // Simple edge detection simulation if toggled
+        if (edgeDetect && x > 0 && y > 0) {
+            const topI = ((y-1) * targetWidth + x) * 4
+            const leftI = (y * targetWidth + (x-1)) * 4
+            const diff = Math.abs(r - data[leftI]) + Math.abs(r - data[topI])
+            // Override r,g,b with diff based intensity
+            r = g = b = Math.min(255, diff * 2) 
+        }
 
         let avg = (r + g + b) / 3
         if (invert) avg = 255 - avg
@@ -88,7 +95,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
 
     setAsciiData(result)
     setIsProcessing(false)
-  }, [width, charSet, invert, grayscale, contrast, brightness])
+  }, [width, charSet, invert, grayscale, contrast, brightness, edgeDetect])
 
   useEffect(() => {
     if (imageFile) {
@@ -106,7 +113,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
   const copyToClipboard = () => {
     const text = asciiData.map((row) => row.map((c) => c.char).join("")).join("\n")
     navigator.clipboard.writeText(text)
-    toast.success("ASCII art copied to clipboard!")
+    toast.success("ASCII payload copied to clipboard")
   }
 
   const downloadAsText = () => {
@@ -115,103 +122,129 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
     a.href = url
-    a.download = "ascii-art.txt"
+    a.download = "pixel-2-ascii-render.txt"
     a.click()
     URL.revokeObjectURL(url)
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <Card className="border-border bg-card lg:col-span-1">
-          <div className="p-6 space-y-6">
-            <div className="flex items-center justify-between border-b border-border pb-4">
-              <h2 className="text-lg font-mono tracking-wide text-foreground">Controls</h2>
-              <Button size="icon" variant="ghost" onClick={processImage} disabled={isProcessing}>
-                <RefreshCw className={`h-4 w-4 ${isProcessing ? "animate-spin" : ""}`} />
-              </Button>
+    <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border">
+      {/* Sidebar Controls - HUD style */}
+      <aside className="w-full md:w-80 lg:w-96 shrink-0 bg-background/50 flex flex-col h-full overflow-y-auto custom-scrollbar p-6">
+        <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-2 text-primary">
+                <ImageIcon className="w-5 h-5"/>
+                <h2 className="font-mono text-lg font-bold uppercase tracking-widest">Image Core</h2>
+            </div>
+            <Button variant="ghost" size="icon" onClick={onReset} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+                <X className="w-4 h-4"/>
+            </Button>
+        </div>
+
+        <div className="space-y-8 flex-1">
+            <div className="space-y-3">
+                <div className="flex justify-between items-center text-xs uppercase tracking-widest font-mono text-muted-foreground">
+                    <span>Resolution Width</span>
+                    <span className="text-primary">{width[0]}px</span>
+                </div>
+                <Slider value={width} onValueChange={setWidth} min={40} max={300} step={1} className="py-2" />
             </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-xs uppercase tracking-widest text-muted-foreground">Character Set</Label>
+            <div className="space-y-3">
+                <div className="text-xs uppercase tracking-widest font-mono text-muted-foreground">Character Dictionary</div>
                 <Select value={charSet} onValueChange={(v: CharSetKey) => setCharSet(v)}>
-                  <SelectTrigger className="bg-background border-border font-mono">
+                  <SelectTrigger className="bg-background/80 border-border font-mono text-sm h-10 rounded-none shadow-none focus:ring-1 focus:ring-primary/50">
                     <SelectValue placeholder="Select set" />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-border">
-                    <SelectItem value="standard">Standard</SelectItem>
-                    <SelectItem value="blocks">Blocks</SelectItem>
-                    <SelectItem value="minimal">Minimal</SelectItem>
-                    <SelectItem value="detailed">Detailed</SelectItem>
+                  <SelectContent className="bg-background border-border rounded-none">
+                    <SelectItem value="standard" className="rounded-none cursor-pointer">Standard <span className="text-primary/50 ml-2">.:-=+*#%@</span></SelectItem>
+                    <SelectItem value="detailed" className="rounded-none cursor-pointer">Detailed <span className="text-primary/50 ml-2">70+ chars</span></SelectItem>
+                    <SelectItem value="blocks" className="rounded-none cursor-pointer">Blocks <span className="text-primary/50 ml-2">░▒▓█</span></SelectItem>
+                    <SelectItem value="minimal" className="rounded-none cursor-pointer">Minimal <span className="text-primary/50 ml-2">.:</span></SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+            </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label className="text-xs uppercase tracking-widest text-muted-foreground">Width: {width[0]}px</Label>
-                </div>
-                <Slider value={width} onValueChange={setWidth} min={40} max={200} step={1} className="py-4" />
-              </div>
+            <div className="h-px bg-border/50 w-full my-4"></div>
 
-              <div className="space-y-4 pt-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="invert" className="text-sm font-mono">Invert Colors</Label>
-                  <Switch id="invert" checked={invert} onCheckedChange={setInvert} />
+            <div className="space-y-5">
+                <div className="text-xs uppercase tracking-widest font-mono text-muted-foreground mb-2">Display Filters</div>
+                
+                <div className="flex items-center justify-between group">
+                  <span className="text-sm font-mono text-foreground group-hover:text-primary transition-colors cursor-pointer" onClick={() => setGrayscale(!grayscale)}>Monochrome Output</span>
+                  <Switch checked={grayscale} onCheckedChange={setGrayscale} className="data-[state=checked]:bg-primary" />
                 </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="grayscale" className="text-sm font-mono">Grayscale Mode</Label>
-                  <Switch id="grayscale" checked={grayscale} onCheckedChange={setGrayscale} />
+                
+                <div className="flex items-center justify-between group">
+                  <span className="text-sm font-mono text-foreground group-hover:text-primary transition-colors cursor-pointer" onClick={() => setInvert(!invert)}>Invert Luminosity</span>
+                  <Switch checked={invert} onCheckedChange={setInvert} className="data-[state=checked]:bg-primary" />
                 </div>
-              </div>
 
-              <div className="space-y-4 pt-2 border-t border-border mt-4">
-                <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-widest text-muted-foreground">Brightness: {brightness[0]}%</Label>
-                  <Slider value={brightness} onValueChange={setBrightness} min={-100} max={100} step={1} />
+                <div className="flex items-center justify-between group">
+                  <span className="text-sm font-mono text-foreground group-hover:text-primary transition-colors cursor-pointer" onClick={() => setEdgeDetect(!edgeDetect)}>Edge Detection [BETA]</span>
+                  <Switch checked={edgeDetect} onCheckedChange={setEdgeDetect} className="data-[state=checked]:bg-primary" />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs uppercase tracking-widest text-muted-foreground">Contrast: {contrast[0]}%</Label>
+            </div>
+
+            <div className="h-px bg-border/50 w-full my-4"></div>
+
+            <div className="space-y-6">
+                <div className="space-y-3">
+                  <div className="flex justify-between text-xs uppercase tracking-widest font-mono text-muted-foreground">
+                      <span>Contrast Adjustment</span>
+                      <span>{contrast[0]}%</span>
+                  </div>
                   <Slider value={contrast} onValueChange={setContrast} min={-100} max={100} step={1} />
                 </div>
-              </div>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between text-xs uppercase tracking-widest font-mono text-muted-foreground">
+                      <span>Brightness Override</span>
+                      <span>{brightness[0]}%</span>
+                  </div>
+                  <Slider value={brightness} onValueChange={setBrightness} min={-100} max={100} step={1} />
+                </div>
             </div>
+        </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-4 border-t border-border">
-              <Button onClick={copyToClipboard} variant="outline" className="btn-terminal py-2 px-3 h-auto text-xs">
-                <Copy className="h-3 w-3 mr-2" /> Copy
-              </Button>
-              <Button onClick={downloadAsText} variant="outline" className="btn-terminal py-2 px-3 h-auto text-xs">
-                <Download className="h-3 w-3 mr-2" /> .TXT
-              </Button>
-              <Button onClick={onReset} variant="outline" className="btn-terminal py-2 px-3 h-auto text-xs col-span-2">
-                New Image
-              </Button>
-            </div>
-          </div>
-        </Card>
+        {/* Action Panel */}
+        <div className="pt-6 border-t border-border mt-8 grid grid-cols-2 gap-3">
+            <Button onClick={copyToClipboard} variant="outline" className="btn-terminal py-4 h-auto flex flex-col gap-2 rounded-none border-border/50 hover:border-primary">
+                <Copy className="h-4 w-4" /> 
+                <span className="text-[10px] tracking-widest">COPY .TXT</span>
+            </Button>
+            <Button onClick={downloadAsText} variant="outline" className="btn-terminal py-4 h-auto flex flex-col gap-2 rounded-none border-border/50 hover:border-primary">
+                <Download className="h-4 w-4" /> 
+                <span className="text-[10px] tracking-widest">DOWNLOAD</span>
+            </Button>
+        </div>
+      </aside>
 
-        <Card className="border-border bg-card lg:col-span-2 overflow-hidden">
-          <div className="p-0 flex flex-col h-full bg-background/50">
-            <div className="border-b border-border p-4 flex items-center justify-between bg-card">
-              <span className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
-                ASCII Generation Result
-              </span>
-              <div className="flex space-x-1">
-                <div className="w-2h-2 rounded-full bg-destructive/50 w-2 h-2"></div>
-                <div className="w-2h-2 rounded-full bg-yellow-500/50 w-2 h-2"></div>
-                <div className="w-2h-2 rounded-full bg-primary/50 w-2 h-2"></div>
-              </div>
+      {/* Main ASCII Canvas Viewport */}
+      <main className="flex-1 bg-black overflow-hidden relative flex flex-col">
+        {/* Viewport Header */}
+        <div className="h-10 bg-[#0a0a0a] border-b border-border/50 flex items-center justify-between px-4 sticky top-0 z-20">
+            <div className="flex gap-2">
+                <div className="w-2 h-2 rounded-full bg-red-500/80"></div>
+                <div className="w-2 h-2 rounded-full bg-yellow-500/80"></div>
+                <div className="w-2 h-2 rounded-full bg-green-500/80"></div>
             </div>
-            
-            <div className="flex-1 overflow-auto p-4 terminal-grid min-h-[400px]">
-              {asciiData.length > 0 ? (
-                <div className="ascii-art leading-[0.8] tracking-tighter mx-auto min-w-max">
+            <div className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">Viewport_1 // Render Target</div>
+            <Button size="icon" variant="ghost" onClick={processImage} disabled={isProcessing} className="h-6 w-6 hover:bg-transparent">
+                <RefreshCw className={`h-3 w-3 text-muted-foreground ${isProcessing ? "animate-spin text-primary" : ""}`} />
+            </Button>
+        </div>
+        
+        {/* Terminal Text Area */}
+        <div className="flex-1 overflow-auto bg-black p-4 md:p-8 custom-scrollbar relative">
+             <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-size-[20px_20px] pointer-events-none"></div>
+
+             {asciiData.length > 0 ? (
+                <div className="font-[Monaco,Consolas,monospace] text-[0.45rem] leading-[0.8] tracking-[0.02em] whitespace-pre mx-auto w-max min-w-full pb-10 select-all">
                   {asciiData.map((row, y) => (
                     <div key={y} className="flex">
                       {row.map((cell, x) => (
-                        <span key={x} style={{ color: cell.color }}>
+                        <span key={x} style={{ color: cell.color, textShadow: edgeDetect ? '0 0 2px rgba(0,0,0,0.8)' : 'none' }}>
                           {cell.char}
                         </span>
                       ))}
@@ -219,14 +252,12 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
                   ))}
                 </div>
               ) : (
-                <div className="h-full flex items-center justify-center text-muted-foreground font-mono text-sm">
-                  {isProcessing ? "Processing..." : "Waiting for image..."}
+                <div className="h-full w-full flex items-center justify-center text-primary/50 font-mono text-sm tracking-widest animate-pulse">
+                  {isProcessing ? "PROCESSING_MATRIX..." : "NO_DATA_AVALIABLE"}
                 </div>
               )}
-            </div>
-          </div>
-        </Card>
-      </div>
+        </div>
+      </main>
 
       <canvas ref={canvasRef} className="hidden" />
     </div>
