@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Copy, Download, Share2, RefreshCw, X, Image as ImageIcon } from "lucide-react"
+import { Copy, Download, Share2, RefreshCw, X, Image as ImageIcon, CloudUpload } from "lucide-react"
 import { toast } from "sonner"
+import { useState as useReactState } from "react" // avoid name conflict with existing imports if needed, but not really needed here since we use standard useState from react
 
 interface ImageToAsciiConverterProps {
   imageFile: File
@@ -127,6 +128,49 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     URL.revokeObjectURL(url)
   }
 
+  const saveToCloud = async () => {
+    if (asciiData.length === 0) return
+    
+    setIsProcessing(true)
+    const toastId = toast.loading("Connecting to ASCII_NET_NODES...")
+
+    try {
+      const response = await fetch('/api/ascii', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: `Render_${Date.now().toString().slice(-4)}`,
+          asciiData,
+          isColor: !grayscale,
+          settings: {
+            width: width[0],
+            charSet,
+            contrast: contrast[0],
+            brightness: brightness[0],
+            invert,
+            grayscale,
+            edgeDetect
+          }
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success("ASCII_SAVED_TO_CLOUD_BUFFER", { id: toastId })
+      } else {
+        throw new Error(data.error || "UPLINK_FAILURE")
+      }
+    } catch (error: any) {
+      console.error(error)
+      toast.error(`ERROR: ${error.message || "UPLINK_FAILURE"}`, { id: toastId })
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
   return (
     <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/20">
       {/* Sidebar Controls - HUD style */}
@@ -232,6 +276,10 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
             <Button onClick={downloadAsText} variant="outline" className="btn-terminal py-4 h-auto flex flex-col gap-2 rounded-none bg-black border-white/20 hover:bg-white group transition-colors">
                 <Download className="h-4 w-4 text-white group-hover:text-black" /> 
                 <span className="text-[10px] tracking-widest text-white group-hover:text-black">DOWNLOAD</span>
+            </Button>
+            <Button onClick={saveToCloud} disabled={isProcessing} variant="outline" className="col-span-2 btn-terminal py-4 h-auto flex gap-3 items-center justify-center rounded-none bg-black border-white/20 hover:bg-white group transition-all">
+                <CloudUpload className={`h-4 w-4 text-white group-hover:text-black ${isProcessing ? 'animate-pulse' : ''}`} /> 
+                <span className="text-[10px] tracking-[0.3em] text-white group-hover:text-black">INITIALIZE_CLOUD_UPLOAD</span>
             </Button>
         </div>
       </aside>
