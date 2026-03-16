@@ -1,61 +1,56 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
 interface MeteorsProps {
   number?: number
+  minDelay?: number
+  maxDelay?: number
+  minDuration?: number
+  maxDuration?: number
+  angle?: number
   className?: string
 }
 
-export const Meteors = ({ number = 20, className }: MeteorsProps) => {
-  const [meteors, setMeteors] = useState<Array<{ id: number; left: number; delay: number; duration: number }>>([])
+export const Meteors = ({
+  number = 20,
+  minDelay = 0.2,
+  maxDelay = 1.2,
+  minDuration = 2,
+  maxDuration = 10,
+  angle = 215,
+  className,
+}: MeteorsProps) => {
+  const [meteorStyles, setMeteorStyles] = useState<Array<React.CSSProperties>>([])
 
   useEffect(() => {
-    // Generate meteors only on client
-    const generated = [...Array(number)].map((_, i) => ({
-      id: i,
-      left: Math.floor(Math.random() * window.innerWidth * 1.5) - window.innerWidth * 0.2, // Spread wider
-      delay: Math.random() * 2, // 0 to 2s delay
-      duration: Math.random() * 3 + 2, // 2 to 5s falling
+    // Generate styles strictly on the client
+    const styles = [...new Array(number)].map(() => ({
+      "--angle": angle + "deg",
+      top: -50 + Math.floor(Math.random() * (window.innerHeight / 2)) + "px", // Spaced across the top half
+      left: Math.floor(Math.random() * window.innerWidth * 1.5) + "px", // Started off-screen right
+      animationDelay: Math.random() * (maxDelay - minDelay) + minDelay + "s",
+      animationDuration: Math.floor(Math.random() * (maxDuration - minDuration) + minDuration) + "s",
     }))
-    setMeteors(generated)
-  }, [number])
+    setMeteorStyles(styles)
+  }, [number, minDelay, maxDelay, minDuration, maxDuration, angle])
 
   return (
     <>
-      {meteors.map((m) => (
-        <motion.div
-          key={m.id}
-          initial={{
-            opacity: 0,
-            x: 0,
-            y: 0,
-          }}
-          animate={{
-            opacity: [0, 1, 1, 0], // fade in, solid, fade out
-            x: -window.innerWidth * 0.8, // Fall diagonally left
-            y: window.innerHeight * 1.2, // Fall down
-          }}
-          transition={{
-            duration: m.duration,
-            delay: m.delay,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          style={{
-            left: m.left,
-            top: -100, // start above screen
-          }}
+      {[...meteorStyles].map((style, idx) => (
+        // Meteor Head
+        <span
+          key={idx}
+          style={{ ...(style as React.CSSProperties) }}
           className={cn(
-            "pointer-events-none absolute w-0.5 h-0.5 rounded-full bg-[#00FFAA] shadow-[0_0_0_1px_#00FFAA80]",
+            "animate-meteor pointer-events-none absolute w-0.5 h-0.5 rounded-full bg-white shadow-[0_0_0_1px_#ffffff10]",
             className
           )}
         >
-          {/* Meteor Tail - rotated fixed because Framer is moving the x/y natively without rotating the container along trajectory */}
-          <div className="pointer-events-none absolute top-1/2 right-0 h-px w-24 -translate-y-1/2 bg-linear-to-l from-[#00FFAA] to-transparent opacity-80 style-tail" style={{ transformOrigin: "right", transform: "rotate(-56deg) translateY(-50%)" }} />
-        </motion.div>
+          {/* Meteor Tail */}
+          <div className="pointer-events-none absolute top-1/2 -z-10 h-px w-20 -translate-y-1/2 bg-gradient-to-r from-white to-transparent opacity-80" />
+        </span>
       ))}
     </>
   )
