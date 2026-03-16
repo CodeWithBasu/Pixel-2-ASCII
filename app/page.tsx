@@ -7,6 +7,7 @@ import { ImageToAsciiConverter } from "@/components/image-to-ascii-converter"
 import { TerminalHeader } from "@/components/terminal-header"
 import { Meteors } from "@/components/meteors"
 import { motion, AnimatePresence } from "framer-motion"
+import { Github, Twitter, Linkedin, Heart, Coffee } from "lucide-react"
 
 export default function HomePage() {
   const [videoFile, setVideoFile] = useState<File | null>(null)
@@ -119,9 +120,27 @@ export default function HomePage() {
                <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
                <input ref={videoInputRef} type="file" accept="video/*" onChange={handleVideoSelect} className="hidden" />
                
-               <div className="w-full flex justify-between items-center border-t border-white/20 pt-6 text-xs font-mono uppercase tracking-widest text-zinc-500">
-                 <div>Build // 2.0.4</div>
-                 <div>Ready for Input</div>
+               <div className="w-full flex flex-col md:flex-row justify-between items-center border-t border-white/10 pt-8 gap-6">
+                 <div className="flex flex-col items-center md:items-start gap-2">
+                   <div className="text-[10px] font-mono uppercase tracking-[0.3em] text-zinc-500">
+                     Build // 2.0.4
+                   </div>
+                   <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
+                     Made with <Heart className="w-3 h-3 text-white fill-white" /> and <Coffee className="w-3 h-3 text-white" /> by <span className="text-white font-bold select-none cursor-default">Basudev</span>
+                   </div>
+                 </div>
+
+                 <div className="flex items-center gap-6">
+                   <a href="https://github.com/CodeWithBasu" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-white transition-colors duration-200">
+                     <Github className="w-5 h-5" />
+                   </a>
+                   <a href="#" className="text-zinc-500 hover:text-white transition-colors duration-200">
+                     <Twitter className="w-5 h-5" />
+                   </a>
+                   <a href="#" className="text-zinc-500 hover:text-white transition-colors duration-200">
+                     <Linkedin className="w-5 h-5" />
+                   </a>
+                 </div>
                </div>
             </motion.div>
           ) : (
