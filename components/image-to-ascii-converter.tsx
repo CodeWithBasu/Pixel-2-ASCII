@@ -128,15 +128,15 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
   }
 
   return (
-    <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border">
+    <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/20">
       {/* Sidebar Controls - HUD style */}
-      <aside className="w-full md:w-80 lg:w-96 shrink-0 bg-black/40 backdrop-blur-md flex flex-col h-full overflow-y-auto custom-scrollbar p-6 border-r border-[#00FFAA]/20">
+      <aside className="w-full md:w-80 lg:w-96 shrink-0 bg-black flex flex-col h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/20">
         <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-2 text-[#00FFAA]">
-                <ImageIcon className="w-5 h-5 drop-shadow-[0_0_8px_rgba(0,255,170,0.5)]"/>
-                <h2 className="font-mono text-lg font-bold uppercase tracking-widest drop-shadow-[0_0_8px_rgba(0,255,170,0.5)]">Image Core</h2>
+            <div className="flex items-center gap-2 text-white">
+                <ImageIcon className="w-5 h-5" />
+                <h2 className="font-mono text-lg font-bold uppercase tracking-widest">Image Core</h2>
             </div>
-            <Button variant="ghost" size="icon" onClick={onReset} className="h-8 w-8 text-zinc-400 hover:text-red-400 hover:bg-red-400/10">
+            <Button variant="ghost" size="icon" onClick={onReset} className="h-8 w-8 rounded-none text-zinc-500 hover:bg-white hover:text-black transition-colors">
                 <X className="w-4 h-4"/>
             </Button>
         </div>
@@ -208,14 +208,14 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
         </div>
 
         {/* Action Panel */}
-        <div className="pt-6 border-t border-[#00FFAA]/20 mt-8 grid grid-cols-2 gap-3 relative z-10">
-            <Button onClick={copyToClipboard} variant="outline" className="btn-terminal py-4 h-auto flex flex-col gap-2 rounded-xl bg-black/50 border-[#00FFAA]/30 hover:bg-[#00FFAA]/10 hover:border-[#00FFAA]/60 hover:shadow-[0_0_15px_rgba(0,255,170,0.2)] transition-all">
-                <Copy className="h-4 w-4 text-[#00FFAA]" /> 
-                <span className="text-[10px] tracking-widest text-zinc-300">COPY .TXT</span>
+        <div className="pt-6 border-t border-white/20 mt-8 grid grid-cols-2 gap-3 relative z-10">
+            <Button onClick={copyToClipboard} variant="outline" className="btn-terminal py-4 h-auto flex flex-col gap-2 rounded-none bg-black border-white/20 hover:bg-white group transition-colors">
+                <Copy className="h-4 w-4 text-white group-hover:text-black" /> 
+                <span className="text-[10px] tracking-widest text-white group-hover:text-black">COPY .TXT</span>
             </Button>
-            <Button onClick={downloadAsText} variant="outline" className="btn-terminal py-4 h-auto flex flex-col gap-2 rounded-xl bg-black/50 border-[#00FFAA]/30 hover:bg-[#00FFAA]/10 hover:border-[#00FFAA]/60 hover:shadow-[0_0_15px_rgba(0,255,170,0.2)] transition-all">
-                <Download className="h-4 w-4 text-[#00FFAA]" /> 
-                <span className="text-[10px] tracking-widest text-zinc-300">DOWNLOAD</span>
+            <Button onClick={downloadAsText} variant="outline" className="btn-terminal py-4 h-auto flex flex-col gap-2 rounded-none bg-black border-white/20 hover:bg-white group transition-colors">
+                <Download className="h-4 w-4 text-white group-hover:text-black" /> 
+                <span className="text-[10px] tracking-widest text-white group-hover:text-black">DOWNLOAD</span>
             </Button>
         </div>
       </aside>
@@ -223,15 +223,15 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
       {/* Main ASCII Canvas Viewport */}
       <main className="flex-1 bg-black overflow-hidden relative flex flex-col">
         {/* Viewport Header */}
-        <div className="h-10 bg-[#050505] border-b border-[#00FFAA]/20 flex items-center justify-between px-4 sticky top-0 z-20">
+        <div className="h-10 bg-black border-b border-white/20 flex items-center justify-between px-4 sticky top-0 z-20">
             <div className="flex gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-500/80 shadow-[0_0_5px_rgba(239,68,68,0.5)]"></div>
-                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 shadow-[0_0_5px_rgba(234,179,8,0.5)]"></div>
-                <div className="w-2.5 h-2.5 rounded-full bg-green-500/80 shadow-[0_0_5px_rgba(34,197,94,0.5)]"></div>
+                <div className="w-2.5 h-2.5 rounded-none bg-white/20 border border-white/40"></div>
+                <div className="w-2.5 h-2.5 rounded-none bg-white/40 border border-white/60"></div>
+                <div className="w-2.5 h-2.5 rounded-none bg-white font-mono flex items-center justify-center text-[5px] text-black font-bold">X</div>
             </div>
             <div className="text-[10px] font-mono tracking-widest uppercase text-zinc-500">Viewport_1 // Render Target</div>
-            <Button size="icon" variant="ghost" onClick={processImage} disabled={isProcessing} className="h-6 w-6 hover:bg-[#00FFAA]/10 text-zinc-400 hover:text-[#00FFAA]">
-                <RefreshCw className={`h-3 w-3 ${isProcessing ? "animate-spin text-[#00FFAA]" : ""}`} />
+            <Button size="icon" variant="ghost" onClick={processImage} disabled={isProcessing} className="h-6 w-6 rounded-none hover:bg-white text-zinc-400 hover:text-black group transition-colors">
+                <RefreshCw className={`h-3 w-3 ${isProcessing ? "animate-spin text-white group-hover:text-black" : "group-hover:text-black"}`} />
             </Button>
         </div>
         
@@ -252,8 +252,8 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
                   ))}
                 </div>
               ) : (
-                <div className="h-full w-full flex items-center justify-center text-primary/50 font-mono text-sm tracking-widest animate-pulse">
-                  {isProcessing ? "PROCESSING_MATRIX..." : "NO_DATA_AVALIABLE"}
+                <div className="h-full w-full flex items-center justify-center text-white/50 font-mono text-sm tracking-widest">
+                  {isProcessing ? "PROCESSING_MATRIX..." : "NO_DATA_AVAILABLE"}
                 </div>
               )}
         </div>
