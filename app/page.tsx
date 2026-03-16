@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { VideoToAsciiConverter } from "@/components/video-to-ascii-converter"
 import { ImageToAsciiConverter } from "@/components/image-to-ascii-converter"
 import { TerminalHeader } from "@/components/terminal-header"
+import Antigravity from "@/components/antigravity"
 import { Upload, Video, Image as ImageIcon } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -62,6 +63,25 @@ export default function HomePage() {
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-background text-foreground font-mono flex flex-col relative">
+      <div className="absolute inset-0 pointer-events-none z-0 opacity-30 mix-blend-screen">
+         <Antigravity
+            count={300}
+            magnetRadius={6}
+            ringRadius={7}
+            waveSpeed={0.4}
+            waveAmplitude={1}
+            particleSize={1.5}
+            lerpSpeed={0.05}
+            color="#00FFAA"
+            autoAnimate
+            particleVariance={1}
+            rotationSpeed={0}
+            depthFactor={1}
+            pulseSpeed={3}
+            particleShape="capsule"
+            fieldStrength={10}
+        />
+      </div>
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(0,255,128,0.03)_0%,transparent_100%)] z-0"></div>
       
       <TerminalHeader />
