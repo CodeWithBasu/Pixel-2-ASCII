@@ -25,7 +25,7 @@ export function TerminalHeader() {
 
   return (
     <header className="border-b border-white/10 bg-black relative z-50">
-      <div className="container mx-auto px-4 md:px-8 py-8">
+      <div className="container mx-auto px-4 md:px-8 py-4 md:py-8">
         <div className="flex items-center justify-between">
           <div className="text-white font-black tracking-tighter text-3xl uppercase">
             Ascii_Studio
