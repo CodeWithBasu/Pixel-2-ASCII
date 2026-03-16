@@ -236,6 +236,20 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
                     </div>
                 </div>
             )}
+
+            <Button 
+                variant="ghost" 
+                onClick={() => {
+                   setWidth([80])
+                   setFps([12])
+                   stopAsciiVideo()
+                   setAsciiFrames([])
+                   setCurrentFrame(0)
+                }}
+                className="w-full h-8 text-[9px] tracking-[0.2em] text-white/30 hover:text-white hover:bg-white/5 border border-white/5 rounded-none mt-4 transition-all"
+            >
+                CLEAR_BUFFER_&_RESET_SYSTEM
+            </Button>
         </div>
 
         {/* Action Panel */}

@@ -79,6 +79,8 @@ export default function HomePage() {
   const resetAll = () => {
     setVideoFile(null)
     setImageFile(null)
+    if (videoInputRef.current) videoInputRef.current.value = ""
+    if (imageInputRef.current) imageInputRef.current.value = ""
   }
 
   return (

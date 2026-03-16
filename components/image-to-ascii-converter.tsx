@@ -205,6 +205,22 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
                   <Slider value={brightness} onValueChange={setBrightness} min={-100} max={100} step={1} />
                 </div>
             </div>
+
+            <Button 
+              variant="ghost" 
+              onClick={() => {
+                setWidth([120])
+                setCharSet("standard")
+                setInvert(false)
+                setGrayscale(false)
+                setEdgeDetect(false)
+                setContrast([20])
+                setBrightness([0])
+              }}
+              className="w-full h-8 text-[9px] tracking-[0.2em] text-white/30 hover:text-white hover:bg-white/5 border border-white/5 rounded-none mt-4 transition-all"
+            >
+              RESET_PARAMETERS_TO_DEFAULT
+            </Button>
         </div>
 
         {/* Action Panel */}
