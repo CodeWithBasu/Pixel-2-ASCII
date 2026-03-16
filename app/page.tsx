@@ -8,11 +8,32 @@ import { TerminalHeader } from "@/components/terminal-header"
 import { Meteors } from "@/components/meteors"
 import { motion, AnimatePresence } from "framer-motion"
 import { Github, Twitter, Linkedin, Heart, Coffee } from "lucide-react"
+import { useEffect } from "react"
+
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(false)
+
+  useEffect(() => {
+    const media = window.matchMedia(query)
+    if (media.matches !== matches) {
+      setMatches(media.matches)
+    }
+    const listener = () => setMatches(media.matches)
+    media.addEventListener("change", listener)
+    return () => media.removeEventListener("change", listener)
+  }, [matches, query])
+
+  return matches
+}
 
 export default function HomePage() {
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [activeMode, setActiveMode] = useState<"video" | "image">("image")
+  
+  const isMobile = useMediaQuery("(max-width: 768px)")
+  const isTablet = useMediaQuery("(max-width: 1024px)")
+  const isTall = useMediaQuery("(min-height: 800px)")
   
   const videoInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
@@ -66,7 +87,12 @@ export default function HomePage() {
          <Meteors number={35} />
       </div>
       
-      <div className="relative z-10 flex flex-col h-full transform scale-[0.85] origin-center">
+      <div 
+        className="relative z-10 flex flex-col h-full origin-center transition-transform duration-500 overflow-hidden"
+        style={{ 
+          transform: isMobile ? 'scale(0.95)' : isTablet ? 'scale(0.9)' : isTall ? 'scale(1)' : 'scale(0.85)' 
+        }}
+      >
         <TerminalHeader />
 
         <main className="flex-1 overflow-hidden flex flex-col p-4 md:p-8">
@@ -80,11 +106,11 @@ export default function HomePage() {
               transition={{ duration: 0.3 }}
               className="flex-1 flex flex-col items-center justify-center space-y-16 h-full w-full max-w-6xl mx-auto"
             >
-               <div className="text-center space-y-6 w-full mix-blend-difference mt-auto">
-                  <h1 className="text-7xl md:text-9xl font-black tracking-tighter uppercase leading-none">
+               <div className="text-center space-y-4 w-full mix-blend-difference">
+                  <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-none">
                     Ascii<br />Generator
                   </h1>
-                  <p className="text-sm md:text-base text-zinc-400 font-mono tracking-widest uppercase max-w-md mx-auto">
+                  <p className="text-xs md:text-base text-zinc-400 font-mono tracking-widest uppercase max-w-md mx-auto">
                     Select a media format to begin.
                   </p>
                </div>
