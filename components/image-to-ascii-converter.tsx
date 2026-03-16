@@ -130,13 +130,13 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
   return (
     <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/20">
       {/* Sidebar Controls - HUD style */}
-      <aside className="w-full md:w-80 lg:w-96 shrink-0 bg-black flex flex-col h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/20">
-        <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-2 text-white">
-                <ImageIcon className="w-5 h-5" />
-                <h2 className="font-mono text-lg font-bold uppercase tracking-widest">Image Core</h2>
+      <aside className="w-full md:w-80 lg:w-96 shrink-0 bg-black flex flex-col h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/10 uppercase tracking-tighter">
+        <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center gap-3 text-white">
+                <ImageIcon className="w-5 h-5"/>
+                <h2 className="font-bold text-xl">Image_Core</h2>
             </div>
-            <Button variant="ghost" size="icon" onClick={onReset} className="h-8 w-8 rounded-none text-zinc-500 hover:bg-white hover:text-black transition-colors">
+            <Button variant="ghost" size="icon" onClick={onReset} className="h-8 w-8 rounded-none text-white/40 hover:bg-white hover:text-black transition-colors">
                 <X className="w-4 h-4"/>
             </Button>
         </div>
@@ -223,14 +223,16 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
       {/* Main ASCII Canvas Viewport */}
       <main className="flex-1 bg-black overflow-hidden relative flex flex-col">
         {/* Viewport Header */}
-        <div className="h-10 bg-black border-b border-white/20 flex items-center justify-between px-4 sticky top-0 z-20">
-            <div className="flex gap-2">
-                <div className="w-2.5 h-2.5 rounded-none bg-white/20 border border-white/40"></div>
-                <div className="w-2.5 h-2.5 rounded-none bg-white/40 border border-white/60"></div>
-                <div className="w-2.5 h-2.5 rounded-none bg-white font-mono flex items-center justify-center text-[5px] text-black font-bold">X</div>
+        <div className="h-10 bg-black border-b border-white/10 flex items-center justify-between px-4 sticky top-0 z-20">
+            <div className="flex gap-4">
+                <div className="flex gap-1.5 items-center">
+                  <div className="w-2 h-2 bg-white/40"></div>
+                  <div className="w-2 h-2 bg-white/60"></div>
+                  <div className="w-2 h-2 bg-white"></div>
+                </div>
+                <div className="text-[10px] font-mono tracking-widest uppercase text-white/40">Viewport_1 // Render Target</div>
             </div>
-            <div className="text-[10px] font-mono tracking-widest uppercase text-zinc-500">Viewport_1 // Render Target</div>
-            <Button size="icon" variant="ghost" onClick={processImage} disabled={isProcessing} className="h-6 w-6 rounded-none hover:bg-white text-zinc-400 hover:text-black group transition-colors">
+            <Button size="icon" variant="ghost" onClick={processImage} disabled={isProcessing} className="h-6 w-6 rounded-none hover:bg-white text-white/40 hover:text-black group transition-colors">
                 <RefreshCw className={`h-3 w-3 ${isProcessing ? "animate-spin text-white group-hover:text-black" : "group-hover:text-black"}`} />
             </Button>
         </div>

@@ -44,7 +44,7 @@ export const Meteors = ({
           key={idx}
           style={{ ...(style as React.CSSProperties) }}
           className={cn(
-            "animate-meteor pointer-events-none absolute w-0.5 h-0.5 rounded-full bg-white shadow-[0_0_0_1px_#ffffff10]",
+            "animate-meteor pointer-events-none absolute w-px h-px rounded-full bg-white shadow-[0_0_4px_rgba(255,255,255,1)]",
             className
           )}
         >

@@ -61,13 +61,14 @@ export default function HomePage() {
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-black text-white selection:bg-white selection:text-black font-sans flex flex-col relative">
-      <div className="absolute inset-0 pointer-events-none z-0 opacity-20">
-         <Meteors number={15} />
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-40">
+         <Meteors number={25} />
       </div>
       
-      <TerminalHeader />
+      <div className="relative z-10 flex flex-col h-full">
+        <TerminalHeader />
 
-      <main className="flex-1 overflow-hidden flex flex-col z-10 p-4 md:p-8">
+        <main className="flex-1 overflow-hidden flex flex-col p-4 md:p-8">
         <AnimatePresence mode="wait">
           {(!videoFile && !imageFile) ? (
             <motion.div 
@@ -141,7 +142,8 @@ export default function HomePage() {
              </motion.div>
           )}
         </AnimatePresence>
-      </main>
+        </main>
+      </div>
     </div>
   )
 }

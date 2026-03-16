@@ -181,13 +181,13 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
   return (
     <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/20">
       {/* Sidebar Controls - HUD style */}
-      <aside className="w-full md:w-80 lg:w-96 shrink-0 bg-black flex flex-col h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/20">
-        <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-2 text-white">
+      <aside className="w-full md:w-80 lg:w-96 shrink-0 bg-black flex flex-col h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/10 uppercase tracking-tighter">
+        <div className="flex items-center justify-between mb-10">
+            <div className="flex items-center gap-3 text-white">
                 <Video className="w-5 h-5"/>
-                <h2 className="font-mono text-lg font-bold uppercase tracking-widest">Video Core</h2>
+                <h2 className="font-bold text-xl">Video_Core</h2>
             </div>
-            <Button variant="ghost" size="icon" onClick={onReset} className="h-8 w-8 rounded-none text-zinc-500 hover:bg-white hover:text-black transition-colors">
+            <Button variant="ghost" size="icon" onClick={onReset} className="h-8 w-8 rounded-none text-white/40 hover:bg-white hover:text-black transition-colors">
                 <X className="w-4 h-4"/>
             </Button>
         </div>
@@ -254,10 +254,14 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
       {/* Main ASCII Canvas Viewport */}
       <main className="flex-1 bg-black overflow-hidden relative flex flex-col">
         {/* Viewport Header */}
-        <div className="h-10 bg-black border-b border-white/20 flex items-center justify-between px-4 sticky top-0 z-20">
-            <div className="flex gap-2">
-                <div className={`w-2.5 h-2.5 rounded-none border border-white/60 ${isPlaying ? 'bg-white' : 'bg-transparent'}`}></div>
-                <div className="text-[10px] font-mono tracking-widest uppercase text-zinc-500 ml-2">
+        <div className="h-10 bg-black border-b border-white/10 flex items-center justify-between px-4 sticky top-0 z-20">
+            <div className="flex gap-4">
+                <div className="flex gap-1.5 items-center">
+                   <div className={`w-2 h-2 ${isPlaying ? 'bg-white' : 'bg-white/20'}`}></div>
+                   <div className={`w-2 h-2 ${isPlaying ? 'bg-white' : 'bg-white/40'}`}></div>
+                   <div className={`w-2 h-2 ${isPlaying ? 'bg-white' : 'bg-white/60'}`}></div>
+                </div>
+                <div className="text-[10px] font-mono tracking-widest uppercase text-white/40 ml-2">
                     {asciiFrames.length > 0 ? `SEQ_${currentFrame + 1}/${asciiFrames.length}` : 'AWAITING_DATA'}
                 </div>
             </div>
