@@ -99,41 +99,41 @@ export default function HomePage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="flex-1 flex flex-col items-center justify-center space-y-8 md:space-y-16 h-full w-full max-w-6xl mx-auto py-4"
+              className="flex-1 flex flex-col items-center justify-between w-full max-w-6xl mx-auto py-8 px-4"
             >
-               <div className="text-center space-y-2 w-full mix-blend-difference py-4 md:py-8">
-                  <h1 className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.9]">
+               <div className="text-center space-y-4 w-full mix-blend-difference mt-auto mb-12">
+                  <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.8] mb-4">
                     Ascii<br />Generator
                   </h1>
-                  <p className="text-[9px] sm:text-xs md:text-base text-zinc-500 font-mono tracking-[0.2em] uppercase max-w-xs sm:max-w-md mx-auto opacity-60">
+                  <p className="text-[10px] sm:text-xs md:text-base text-zinc-500 font-mono tracking-[0.3em] uppercase max-w-xs sm:max-w-md mx-auto opacity-60">
                     Select a media format to begin.
                   </p>
                </div>
 
                 <div 
-                  className="w-full grid grid-cols-1 md:grid-cols-2 gap-3 flex-1 min-h-0 px-2"
+                  className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-auto"
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                >
                   <div 
-                    className="p-5 md:p-10 border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between aspect-video md:aspect-auto group"
+                    className="p-8 md:p-12 lg:p-14 border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between aspect-video md:aspect-3/2 group"
                     onClick={() => imageInputRef.current?.click()}
                   >
-                    <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">01 // Format</div>
+                    <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">01 // Format</div>
                     <div>
-                      <h3 className="text-2xl md:text-5xl lg:text-6xl font-bold tracking-tighter uppercase mb-1">Image</h3>
-                      <p className="text-[10px] font-mono text-zinc-600 group-hover:text-black transition-colors">PNG . JPG . WEBP</p>
+                      <h3 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tighter uppercase mb-2">Image</h3>
+                      <p className="text-[11px] font-mono text-zinc-600 group-hover:text-black transition-colors">PNG . JPG . WEBP</p>
                     </div>
                   </div>
                   
                   <div 
-                    className="p-5 md:p-10 border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between aspect-video md:aspect-auto group"
+                    className="p-8 md:p-12 lg:p-14 border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between aspect-video md:aspect-3/2 group"
                     onClick={() => videoInputRef.current?.click()}
                   >
-                    <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">02 // Format</div>
+                    <div className="text-[10px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">02 // Format</div>
                     <div>
-                      <h3 className="text-2xl md:text-5xl lg:text-6xl font-bold tracking-tighter uppercase mb-1">Video</h3>
-                      <p className="text-[10px] font-mono text-zinc-600 group-hover:text-black transition-colors">MP4 . WEBM</p>
+                      <h3 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tighter uppercase mb-2">Video</h3>
+                      <p className="text-[11px] font-mono text-zinc-600 group-hover:text-black transition-colors">MP4 . WEBM</p>
                     </div>
                   </div>
                </div>
@@ -141,25 +141,25 @@ export default function HomePage() {
                <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
                <input ref={videoInputRef} type="file" accept="video/*" onChange={handleVideoSelect} className="hidden" />
                
-               <div className="w-full flex flex-col md:flex-row justify-between items-center border-t border-white/5 py-6 gap-4 md:gap-6 mt-4 opacity-50">
-                 <div className="flex flex-col items-center md:items-start gap-1">
-                   <div className="text-[8px] font-mono uppercase tracking-[0.3em] text-zinc-600">
+               <div className="w-full flex flex-col md:flex-row justify-between items-center border-t border-white/5 py-10 gap-6 mt-16 pb-4">
+                 <div className="flex flex-col items-center md:items-start gap-2">
+                   <div className="text-[10px] font-mono uppercase tracking-[0.4em] text-zinc-600">
                      Build // 2.0.4
                    </div>
-                   <div className="flex items-center gap-2 text-[9px] font-mono text-zinc-500 uppercase tracking-tighter">
-                     Made with <Heart className="w-2.5 h-2.5 text-white/20 fill-white/10" /> & <Coffee className="w-2.5 h-2.5 text-white/20" /> by <span className="text-white/60 font-bold">Basudev</span>
+                   <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-500 uppercase tracking-tighter">
+                     Made with <Heart className="w-3 h-3 text-white/30 fill-white/10" /> & <Coffee className="w-3 h-3 text-white/30" /> by <span className="text-white/70 font-bold">Basudev</span>
                    </div>
                  </div>
 
-                 <div className="flex items-center gap-6">
+                 <div className="flex items-center gap-10">
                    <a href="https://github.com/CodeWithBasu" target="_blank" rel="noopener noreferrer" className="text-zinc-600 hover:text-white transition-colors duration-300">
-                     <Github className="w-3.5 h-3.5" />
+                     <Github className="w-5 h-5" />
                    </a>
                    <a href="#" className="text-zinc-600 hover:text-white transition-colors duration-300">
-                     <Twitter className="w-3.5 h-3.5" />
+                     <Twitter className="w-5 h-5" />
                    </a>
                    <a href="#" className="text-zinc-600 hover:text-white transition-colors duration-300">
-                     <Linkedin className="w-3.5 h-3.5" />
+                     <Linkedin className="w-5 h-5" />
                    </a>
                  </div>
                </div>
