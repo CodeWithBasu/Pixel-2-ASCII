@@ -44,12 +44,12 @@ export const Meteors = ({
           key={idx}
           style={{ ...(style as React.CSSProperties) }}
           className={cn(
-            "animate-meteor pointer-events-none absolute w-[2px] h-[2px] rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,1)]",
+            "animate-meteor pointer-events-none absolute w-px h-px rounded-full bg-white shadow-[0_0_4px_rgba(255,255,255,0.8)]",
             className
           )}
         >
           {/* Meteor Tail */}
-          <div className="pointer-events-none absolute top-1/2 -z-10 h-[2px] w-32 -translate-y-1/2 bg-linear-to-r from-white to-transparent opacity-100" />
+          <div className="pointer-events-none absolute top-1/2 -z-10 h-px w-24 -translate-y-1/2 bg-linear-to-r from-white/60 to-transparent opacity-100" />
         </span>
       ))}
     </>
