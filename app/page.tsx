@@ -61,11 +61,11 @@ export default function HomePage() {
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-black text-white selection:bg-white selection:text-black font-sans flex flex-col relative">
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-40">
-         <Meteors number={25} />
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-80">
+         <Meteors number={35} />
       </div>
       
-      <div className="relative z-10 flex flex-col h-full">
+      <div className="relative z-10 flex flex-col h-full transform scale-[0.85] origin-center">
         <TerminalHeader />
 
         <main className="flex-1 overflow-hidden flex flex-col p-4 md:p-8">
