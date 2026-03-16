@@ -101,8 +101,10 @@ const AntigravityInner: React.FC<AntigravityProps> = ({
       lastMousePos.current = { x: m.x, y: m.y };
     }
 
-    let destX = (m.x * v.width) / 2;
-    let destY = (m.y * v.height) / 2;
+    // Use raw pointer coordinates (-1 to 1) multiplied by a spread factor
+    // so it moves fully across the screen instead of clustering in center
+    let destX = m.x * (v.width || 50);
+    let destY = m.y * (v.height || 50);
 
     if (autoAnimate && Date.now() - lastMouseMoveTime.current > 2000) {
       const time = state.clock.getElapsedTime();

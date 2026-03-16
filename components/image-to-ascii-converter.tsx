@@ -102,7 +102,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
       const url = URL.createObjectURL(imageFile)
       const img = new Image()
       img.onload = () => {
-        imageRef.current = img
+        (imageRef as React.MutableRefObject<HTMLImageElement | null>).current = img
         processImage()
       }
       img.src = url
