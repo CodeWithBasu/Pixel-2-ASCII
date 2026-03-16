@@ -181,13 +181,13 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
   return (
     <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-border">
       {/* Sidebar Controls - HUD style */}
-      <aside className="w-full md:w-80 lg:w-96 shrink-0 bg-background/50 flex flex-col h-full overflow-y-auto custom-scrollbar p-6">
+      <aside className="w-full md:w-80 lg:w-96 shrink-0 bg-black/40 backdrop-blur-md flex flex-col h-full overflow-y-auto custom-scrollbar p-6 border-r border-[#00FFAA]/20">
         <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-2 text-primary">
-                <Video className="w-5 h-5"/>
-                <h2 className="font-mono text-lg font-bold uppercase tracking-widest">Video Core</h2>
+            <div className="flex items-center gap-2 text-[#00FFAA]">
+                <Video className="w-5 h-5 drop-shadow-[0_0_8px_rgba(0,255,170,0.5)]"/>
+                <h2 className="font-mono text-lg font-bold uppercase tracking-widest drop-shadow-[0_0_8px_rgba(0,255,170,0.5)]">Video Core</h2>
             </div>
-            <Button variant="ghost" size="icon" onClick={onReset} className="h-8 w-8 text-muted-foreground hover:text-destructive">
+            <Button variant="ghost" size="icon" onClick={onReset} className="h-8 w-8 text-zinc-400 hover:text-red-400 hover:bg-red-400/10">
                 <X className="w-4 h-4"/>
             </Button>
         </div>
@@ -239,14 +239,14 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
         </div>
 
         {/* Action Panel */}
-        <div className="pt-6 border-t border-border mt-8 grid grid-cols-2 gap-3">
-            <Button onClick={isPlaying ? stopAsciiVideo : playAsciiVideo} disabled={asciiFrames.length === 0} variant="outline" className={`btn-terminal py-4 h-auto flex flex-col gap-2 rounded-none border-border/50 hover:border-primary ${isPlaying ? 'bg-primary/10 border-primary text-primary' : ''}`}>
-                {isPlaying ? <Square className="h-4 w-4" /> : <Play className="h-4 w-4 ml-1" />}
-                <span className="text-[10px] tracking-widest">{isPlaying ? 'HALT' : 'PLAY'}</span>
+        <div className="pt-6 border-t border-[#00FFAA]/20 mt-8 grid grid-cols-2 gap-3 relative z-10">
+            <Button onClick={isPlaying ? stopAsciiVideo : playAsciiVideo} disabled={asciiFrames.length === 0} variant="outline" className={`btn-terminal py-4 h-auto flex flex-col gap-2 rounded-xl bg-black/50 border-[#00FFAA]/30 transition-all hover:bg-[#00FFAA]/10 hover:border-[#00FFAA]/60 hover:shadow-[0_0_15px_rgba(0,255,170,0.2)] ${isPlaying ? 'bg-[#00FFAA]/10 border-[#00FFAA] text-[#00FFAA] shadow-[inset_0_0_10px_rgba(0,255,170,0.2)]' : ''}`}>
+                {isPlaying ? <Square className={`h-4 w-4 ${isPlaying ? "text-[#00FFAA]" : "text-zinc-400"}`} /> : <Play className="h-4 w-4 ml-1 text-[#00FFAA]" />}
+                <span className={`text-[10px] tracking-widest ${isPlaying ? "text-[#00FFAA]" : "text-zinc-300"}`}>{isPlaying ? 'HALT' : 'PLAY'}</span>
             </Button>
-            <Button onClick={downloadAsTextSequence} disabled={asciiFrames.length === 0 || isProcessing} variant="outline" className="btn-terminal py-4 h-auto flex flex-col gap-2 rounded-none border-border/50 hover:border-primary">
-                <Download className="h-4 w-4" /> 
-                <span className="text-[10px] tracking-widest">EXPORT</span>
+            <Button onClick={downloadAsTextSequence} disabled={asciiFrames.length === 0 || isProcessing} variant="outline" className="btn-terminal py-4 h-auto flex flex-col gap-2 rounded-xl bg-black/50 border-[#00FFAA]/30 transition-all hover:bg-[#00FFAA]/10 hover:border-[#00FFAA]/60 hover:shadow-[0_0_15px_rgba(0,255,170,0.2)] disabled:opacity-50">
+                <Download className="h-4 w-4 text-[#00FFAA]" /> 
+                <span className="text-[10px] tracking-widest text-zinc-300">EXPORT</span>
             </Button>
         </div>
       </aside>
@@ -254,10 +254,10 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
       {/* Main ASCII Canvas Viewport */}
       <main className="flex-1 bg-black overflow-hidden relative flex flex-col">
         {/* Viewport Header */}
-        <div className="h-10 bg-[#0a0a0a] border-b border-border/50 flex items-center justify-between px-4 sticky top-0 z-20">
+        <div className="h-10 bg-[#050505] border-b border-[#00FFAA]/20 flex items-center justify-between px-4 sticky top-0 z-20">
             <div className="flex gap-2">
-                <div className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-primary animate-pulse' : 'bg-primary/30'}`}></div>
-                <div className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground ml-2">
+                <div className={`w-2.5 h-2.5 rounded-full ${isPlaying ? 'bg-[#00FFAA] animate-pulse shadow-[0_0_8px_rgba(0,255,170,0.8)]' : 'bg-[#00FFAA]/30'}`}></div>
+                <div className="text-[10px] font-mono tracking-widest uppercase text-zinc-500 ml-2">
                     {asciiFrames.length > 0 ? `SEQ_${currentFrame + 1}/${asciiFrames.length}` : 'AWAITING_DATA'}
                 </div>
             </div>
