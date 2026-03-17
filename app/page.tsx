@@ -8,32 +8,14 @@ import { TerminalHeader } from "@/components/terminal-header"
 import { Meteors } from "@/components/meteors"
 import { motion, AnimatePresence } from "framer-motion"
 import { Github, Twitter, Linkedin, Heart, Coffee } from "lucide-react"
-import { useEffect } from "react"
-
-function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(false)
-
-  useEffect(() => {
-    const media = window.matchMedia(query)
-    if (media.matches !== matches) {
-      setMatches(media.matches)
-    }
-    const listener = () => setMatches(media.matches)
-    media.addEventListener("change", listener)
-    return () => media.removeEventListener("change", listener)
-  }, [matches, query])
-
-  return matches
-}
+import { useResponsive } from "@/hooks/use-responsive"
 
 export default function HomePage() {
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [activeMode, setActiveMode] = useState<"video" | "image">("image")
   
-  const isMobile = useMediaQuery("(max-width: 768px)")
-  const isTablet = useMediaQuery("(max-width: 1024px)")
-  const isTall = useMediaQuery("(min-height: 800px)")
+  const { isMobile, isTablet } = useResponsive()
   
   const videoInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)

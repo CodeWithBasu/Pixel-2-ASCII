@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { X, Video, Play, Square, Download, RefreshCw, CloudUpload } from "lucide-react"
 import { toast } from "sonner"
+import { useResponsive } from "@/hooks/use-responsive"
 
 interface VideoToAsciiConverterProps {
   videoFile: File
@@ -14,12 +15,13 @@ interface VideoToAsciiConverterProps {
 const ASCII_CHARS = " .:-=+*#%@"
 
 export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConverterProps) {
+  const { isMobile, isTablet } = useResponsive()
   const [isPlaying, setIsPlaying] = useState(false)
   const [asciiFrames, setAsciiFrames] = useState<string[]>([])
   const [currentFrame, setCurrentFrame] = useState(0)
   const [isProcessing, setIsProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [width, setWidth] = useState([80])
+  const [width, setWidth] = useState([isMobile ? 40 : isTablet ? 60 : 80])
   const [fps, setFps] = useState([12])
 
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -373,9 +375,16 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-size-[20px_20px] pointer-events-none"></div>
 
              {asciiFrames.length > 0 ? (
-                <div className="font-[Monaco,Consolas,monospace] text-primary text-[0.45rem] sm:text-[0.6rem] leading-[0.8] tracking-[0.02em] whitespace-pre mx-auto w-max pb-10">
-                  {asciiFrames[currentFrame]}
-                </div>
+                <div 
+            className="flex-1 overflow-auto bg-black p-4 flex items-center justify-center custom-scrollbar"
+            style={{ 
+              fontSize: isMobile ? '0.35rem' : isTablet ? '0.5rem' : '0.65rem'
+            }}
+          >
+            <pre className="font-mono leading-[0.8] whitespace-pre border border-white/5 p-4 bg-black select-none grayscale contrast-125">
+              {asciiFrames[currentFrame]}
+            </pre>
+          </div>
               ) : (
                 <div className="h-full w-full flex items-center justify-center text-primary/50 font-mono text-sm tracking-widest">
                   {isProcessing ? (

@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Copy, Download, Share2, RefreshCw, X, Image as ImageIcon, CloudUpload } from "lucide-react"
 import { toast } from "sonner"
-import { useState as useReactState } from "react" // avoid name conflict with existing imports if needed, but not really needed here since we use standard useState from react
+import { useResponsive } from "@/hooks/use-responsive"
 
 interface ImageToAsciiConverterProps {
   imageFile: File
@@ -24,9 +24,10 @@ const CHARACTER_SETS = {
 type CharSetKey = keyof typeof CHARACTER_SETS
 
 export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConverterProps) {
+  const { isMobile, isTablet } = useResponsive()
   const [asciiData, setAsciiData] = useState<{ char: string; color?: string }[][]>([])
   const [isProcessing, setIsProcessing] = useState(false)
-  const [width, setWidth] = useState([120])
+  const [width, setWidth] = useState([isMobile ? 60 : isTablet ? 100 : 120])
   const [charSet, setCharSet] = useState<CharSetKey>("standard")
   const [invert, setInvert] = useState(false)
   const [grayscale, setGrayscale] = useState(false)
@@ -309,17 +310,25 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-size-[20px_20px] pointer-events-none"></div>
 
              {asciiData.length > 0 ? (
-                <div className="font-[Monaco,Consolas,monospace] text-[0.45rem] leading-[0.8] tracking-[0.02em] whitespace-pre mx-auto w-max min-w-full pb-10 select-all">
-                  {asciiData.map((row, y) => (
-                    <div key={y} className="flex">
-                      {row.map((cell, x) => (
-                        <span key={x} style={{ color: cell.color, textShadow: edgeDetect ? '0 0 2px rgba(0,0,0,0.8)' : 'none' }}>
-                          {cell.char}
-                        </span>
-                      ))}
-                    </div>
+                <div 
+            className="flex-1 overflow-auto custom-scrollbar bg-black p-4 flex items-center justify-center"
+            style={{ 
+              fontSize: isMobile ? '0.25rem' : isTablet ? '0.35rem' : '0.5rem',
+              lineHeight: 1
+            }}
+          >
+            <div className="ascii-art cursor-default select-none border border-white/5 p-4 bg-black">
+              {asciiData.map((row, y) => (
+                <div key={y} className="flex">
+                  {row.map((cell, x) => (
+                    <span key={x} style={{ color: cell.color }}>
+                      {cell.char}
+                    </span>
                   ))}
                 </div>
+              ))}
+            </div>
+          </div>
               ) : (
                 <div className="h-full w-full flex items-center justify-center text-white/50 font-mono text-sm tracking-widest">
                   {isProcessing ? "PROCESSING_MATRIX..." : "NO_DATA_AVAILABLE"}
