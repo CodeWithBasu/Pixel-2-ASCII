@@ -1,6 +1,6 @@
 # 🌌 ASCII Studio
 
-![ASCII Studio Hero](./public/hero.png)
+![ASCII Studio Hero](public/hero.png)
 
 **ASCII Studio** is a high-performance web application designed for digital artists and terminal enthusiasts. It transforms your images and videos into mesmerizing ASCII matrix art using real-time character-density algorithms. With built-in cloud synchronization, you can archive your transmissions and share them with the local community vault.
 
