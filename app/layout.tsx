@@ -18,10 +18,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: '/icon.png',
+        url: '/hero.png',
       },
     ],
-    apple: '/icon.png',
+    apple: '/hero.png',
   },
   manifest: '/manifest.json',
 }

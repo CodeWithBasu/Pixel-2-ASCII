@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
+import Image from "next/image"
 import { LogOut, User, ShieldCheck } from "lucide-react"
 
 export function TerminalHeader() {
@@ -53,8 +54,16 @@ export function TerminalHeader() {
     <header className="border-b border-white/10 bg-black relative z-50">
       <div className="container mx-auto px-4 md:px-8 py-4 md:py-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <Link href="/" className="text-white font-black tracking-tighter text-3xl uppercase hover:opacity-80 transition-opacity">
-            Ascii_Studio
+          <Link href="/" className="flex items-center gap-4 text-white font-black tracking-tighter text-3xl uppercase hover:opacity-80 transition-opacity">
+            <div className="relative w-10 h-10 overflow-hidden border border-white/20">
+              <Image 
+                src="/hero.png" 
+                alt="Logo" 
+                fill 
+                className="object-cover"
+              />
+            </div>
+            <span>Ascii_Studio</span>
           </Link>
 
           <div className="flex flex-wrap items-center gap-6 md:gap-12">
