@@ -34,6 +34,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
   const [edgeDetect, setEdgeDetect] = useState(false) // New feature toggle
   const [contrast, setContrast] = useState([20]) // Default boosted slightly for deeper ASCII feel
   const [brightness, setBrightness] = useState([0])
+  const [viewMode, setViewMode] = useState<"controls" | "render">("render")
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
@@ -176,9 +177,27 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
   }
 
   return (
-    <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/20">
+    <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/20 overflow-hidden">
+      {/* Mobile Toggle Bar */}
+      {isMobile && (
+        <div className="flex shrink-0 border-b border-white/10">
+          <button 
+            onClick={() => setViewMode("controls")}
+            className={`flex-1 py-3 text-[10px] font-mono tracking-widest uppercase transition-colors ${viewMode === 'controls' ? 'bg-white text-black' : 'text-white/40 bg-black'}`}
+          >
+            CONTROLS
+          </button>
+          <button 
+            onClick={() => setViewMode("render")}
+            className={`flex-1 py-3 text-[10px] font-mono tracking-widest uppercase transition-colors ${viewMode === 'render' ? 'bg-white text-black' : 'text-white/40 bg-black'}`}
+          >
+            RENDER_VIEW
+          </button>
+        </div>
+      )}
+
       {/* Sidebar Controls - HUD style */}
-      <aside className="w-full md:w-80 lg:w-96 shrink-0 bg-black flex flex-col h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/10 uppercase tracking-tighter">
+      <aside className={`${isMobile && viewMode !== 'controls' ? 'hidden' : 'flex'} w-full md:w-80 lg:w-96 shrink-0 bg-black flex flex-col h-auto md:h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/10 uppercase tracking-tighter`}>
         <div className="flex items-center justify-between mb-10">
             <div className="flex items-center gap-3 text-white">
                 <ImageIcon className="w-5 h-5"/>
@@ -287,9 +306,9 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
             </Button>
         </div>
       </aside>
-
+ 
       {/* Main ASCII Canvas Viewport */}
-      <main className="flex-1 bg-black overflow-hidden relative flex flex-col">
+      <main className={`${isMobile && viewMode !== 'render' ? 'hidden' : 'flex'} flex-1 bg-black overflow-hidden relative flex flex-col`}>
         {/* Viewport Header */}
         <div className="h-10 bg-black border-b border-white/10 flex items-center justify-between px-4 sticky top-0 z-20">
             <div className="flex gap-4">
@@ -306,29 +325,27 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
         </div>
         
         {/* Terminal Text Area */}
-        <div className="flex-1 overflow-auto bg-black p-4 md:p-8 custom-scrollbar relative">
+        <div className="flex-1 overflow-auto bg-black p-4 md:p-8 custom-scrollbar relative flex items-center justify-center">
              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-size-[20px_20px] pointer-events-none"></div>
 
              {asciiData.length > 0 ? (
                 <div 
-            className="flex-1 overflow-auto custom-scrollbar bg-black p-4 flex items-center justify-center"
-            style={{ 
-              fontSize: isMobile ? '0.25rem' : isTablet ? '0.35rem' : '0.5rem',
-              lineHeight: 1
-            }}
-          >
-            <div className="ascii-art cursor-default select-none border border-white/5 p-4 bg-black">
-              {asciiData.map((row, y) => (
-                <div key={y} className="flex">
-                  {row.map((cell, x) => (
-                    <span key={x} style={{ color: cell.color }}>
-                      {cell.char}
-                    </span>
+                  className="ascii-art cursor-default select-none border border-white/5 p-4 bg-black"
+                  style={{ 
+                    fontSize: isMobile ? '0.25rem' : isTablet ? '0.35rem' : '0.5rem',
+                    lineHeight: 1
+                  }}
+                >
+                  {asciiData.map((row, y) => (
+                    <div key={y} className="flex">
+                      {row.map((cell, x) => (
+                        <span key={x} style={{ color: cell.color }}>
+                          {cell.char}
+                        </span>
+                      ))}
+                    </div>
                   ))}
                 </div>
-              ))}
-            </div>
-          </div>
               ) : (
                 <div className="h-full w-full flex items-center justify-center text-white/50 font-mono text-sm tracking-widest">
                   {isProcessing ? "PROCESSING_MATRIX..." : "NO_DATA_AVAILABLE"}

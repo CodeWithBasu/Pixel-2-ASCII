@@ -22,6 +22,7 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
   const [isProcessing, setIsProcessing] = useState(false)
   const [progress, setProgress] = useState(0)
   const [width, setWidth] = useState([isMobile ? 40 : isTablet ? 60 : 80])
+  const [viewMode, setViewMode] = useState<"controls" | "render">("render")
   const [fps, setFps] = useState([12])
 
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -255,14 +256,32 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
     } catch (error: any) {
       toast.error(`Archive failed: ${error.message}`, { id: toastId })
     } finally {
-      setIsProcessing(false)
+       setIsProcessing(false)
     }
   }
 
   return (
-    <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/20">
+    <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/20 overflow-hidden">
+      {/* Mobile Toggle Bar */}
+      {isMobile && (
+        <div className="flex shrink-0 border-b border-white/10">
+          <button 
+            onClick={() => setViewMode("controls")}
+            className={`flex-1 py-3 text-[10px] font-mono tracking-widest uppercase transition-colors ${viewMode === 'controls' ? 'bg-white text-black' : 'text-white/40 bg-black'}`}
+          >
+            CONTROLS
+          </button>
+          <button 
+            onClick={() => setViewMode("render")}
+            className={`flex-1 py-3 text-[10px] font-mono tracking-widest uppercase transition-colors ${viewMode === 'render' ? 'bg-white text-black' : 'text-white/40 bg-black'}`}
+          >
+            RENDER_VIEW
+          </button>
+        </div>
+      )}
+
       {/* Sidebar Controls - HUD style */}
-      <aside className="w-full md:w-80 lg:w-96 shrink-0 bg-black flex flex-col h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/10 uppercase tracking-tighter">
+      <aside className={`${isMobile && viewMode !== 'controls' ? 'hidden' : 'flex'} w-full md:w-80 lg:w-96 shrink-0 bg-black flex flex-col h-auto md:h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/10 uppercase tracking-tighter`}>
         <div className="flex items-center justify-between mb-10">
             <div className="flex items-center gap-3 text-white">
                 <Video className="w-5 h-5"/>
@@ -351,7 +370,7 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
       </aside>
 
       {/* Main ASCII Canvas Viewport */}
-      <main className="flex-1 bg-black overflow-hidden relative flex flex-col">
+      <main className={`${isMobile && viewMode !== 'render' ? 'hidden' : 'flex'} flex-1 bg-black overflow-hidden relative flex flex-col`}>
         {/* Viewport Header */}
         <div className="h-10 bg-black border-b border-white/10 flex items-center justify-between px-4 sticky top-0 z-20">
             <div className="flex gap-4">
