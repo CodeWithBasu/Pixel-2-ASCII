@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
 import connectToDatabase from '@/lib/mongodb';
 import AsciiArt from '@/models/AsciiArt';
+import { getUser } from '@/lib/auth';
 
 export async function POST(req: Request) {
   try {
+    const user = await getUser();
     await connectToDatabase();
     const body = await req.json();
 
@@ -18,7 +20,7 @@ export async function POST(req: Request) {
       asciiText: JSON.stringify(asciiData),
       isColor,
       settings,
-      author: 'Basudev_Studio_User'
+      author: user ? (user as any).name : 'Anonymous'
     });
 
     return NextResponse.json({ success: true, id: newArt._id }, { status: 201 });

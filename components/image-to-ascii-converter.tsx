@@ -159,7 +159,10 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
       const data = await response.json()
 
       if (data.success) {
-        toast.success("ASCII capture pushed to grid", { id: toastId })
+        toast.success("ASCII image uploaded successfully to cloud", { 
+          id: toastId,
+          description: "Transmission archived in the community vault.",
+        })
       } else {
         throw new Error(data.error || "Uplink synchronization failed")
       }

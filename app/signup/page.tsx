@@ -1,0 +1,119 @@
+"use client"
+
+import { useState } from "react"
+import { TerminalHeader } from "@/components/terminal-header"
+import { Meteors } from "@/components/meteors"
+import { motion } from "framer-motion"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import Link from "next/link"
+
+export default function SignupPage() {
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
+  const router = useRouter()
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      })
+
+      const data = await res.json()
+
+      if (data.success) {
+        toast.success("Identity established. Node added to matrix.")
+        router.push("/")
+        router.refresh()
+      } else {
+        toast.error(data.error || "Establishment failed. Try again.")
+      }
+    } catch (error) {
+      toast.error("Internal core error during establishment.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen w-screen bg-black text-white font-sans flex flex-col relative overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-40">
+        <Meteors number={10} />
+      </div>
+
+      <div className="relative z-10 flex flex-col h-full w-full lg:max-w-7xl lg:mx-auto">
+        <TerminalHeader />
+
+        <main className="flex-1 flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md border border-white/10 bg-zinc-900/20 backdrop-blur-md p-8 md:p-12"
+          >
+            <div className="mb-10 text-center">
+              <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.5em] block mb-2">Registry_Protocol</span>
+              <h1 className="text-4xl font-black tracking-tighter uppercase">Establish_Identity</h1>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Ident_Handle (Name)</label>
+                <input 
+                  type="text" 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full bg-black border border-white/10 p-3 font-mono text-sm focus:border-white transition-colors outline-none"
+                  placeholder="Basudev"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Email_Uplink</label>
+                <input 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-black border border-white/10 p-3 font-mono text-sm focus:border-white transition-colors outline-none"
+                  placeholder="user@ascii.studio"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Secure_Cipher</label>
+                <input 
+                  type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-black border border-white/10 p-3 font-mono text-sm focus:border-white transition-colors outline-none"
+                  placeholder="********"
+                  required
+                />
+              </div>
+
+              <button 
+                type="submit"
+                disabled={loading}
+                className="w-full bg-white text-black font-black uppercase tracking-[0.2em] py-4 hover:bg-zinc-200 transition-all disabled:opacity-50"
+              >
+                {loading ? "ESTABLISHING..." : "INITIALIZE_ID"}
+              </button>
+            </form>
+
+            <div className="mt-8 text-center text-xs text-zinc-600 font-mono">
+              Already registered? <Link href="/login" className="text-white hover:underline underline-offset-4">Relogin_ID</Link>
+            </div>
+          </motion.div>
+        </main>
+      </div>
+    </div>
+  )
+}

@@ -243,7 +243,10 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
 
       const data = await response.json()
       if (data.success) {
-        toast.success("Frame archived to community gallery", { id: toastId })
+        toast.success("ASCII video frame uploaded successfully to cloud", { 
+          id: toastId,
+          description: "Transmission archived in the community vault.",
+        })
       } else {
         throw new Error(data.error)
       }
