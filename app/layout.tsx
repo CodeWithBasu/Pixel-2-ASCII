@@ -26,6 +26,8 @@ export const metadata: Metadata = {
     ],
     apple: '/apple-icon.png',
   },
+  manifest: '/manifest.json',
+  themeColor: '#000000',
 }
 
 export default function RootLayout({
@@ -39,6 +41,17 @@ export default function RootLayout({
         {children}
         <Analytics />
         <Toaster richColors theme="dark" position="bottom-right" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js');
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   )
