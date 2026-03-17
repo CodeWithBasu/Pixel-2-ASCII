@@ -132,7 +132,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     if (asciiData.length === 0) return
     
     setIsProcessing(true)
-    const toastId = toast.loading("Connecting to ASCII_NET_NODES...")
+    const toastId = toast.loading("Syncing to cloud uplink...")
 
     try {
       const response = await fetch('/api/ascii', {
@@ -141,7 +141,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title: `Render_${Date.now().toString().slice(-4)}`,
+          title: `Capture_${Date.now().toString().slice(-4)}`,
           asciiData,
           isColor: !grayscale,
           settings: {
@@ -159,13 +159,13 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
       const data = await response.json()
 
       if (data.success) {
-        toast.success("ASCII_SAVED_TO_CLOUD_BUFFER", { id: toastId })
+        toast.success("ASCII capture pushed to grid", { id: toastId })
       } else {
-        throw new Error(data.error || "UPLINK_FAILURE")
+        throw new Error(data.error || "Uplink synchronization failed")
       }
     } catch (error: any) {
       console.error(error)
-      toast.error(`ERROR: ${error.message || "UPLINK_FAILURE"}`, { id: toastId })
+      toast.error(`Sync error: ${error.message || "Failed to push data"}`, { id: toastId })
     } finally {
       setIsProcessing(false)
     }

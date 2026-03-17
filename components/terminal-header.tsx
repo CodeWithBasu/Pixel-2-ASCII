@@ -1,9 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 export function TerminalHeader() {
   const [currentTime, setCurrentTime] = useState("")
+  const pathname = usePathname()
 
   useEffect(() => {
     const updateTime = () => {
@@ -32,6 +35,14 @@ export function TerminalHeader() {
           </div>
 
           <div className="flex items-center space-x-12">
+            <nav className="hidden md:flex items-center space-x-8 mr-12 border-l border-white/5 pl-8">
+              <Link href="/" className={`text-[10px] font-mono tracking-[0.3em] uppercase transition-colors ${pathname === '/' ? 'text-white underline' : 'text-zinc-600 hover:text-white'}`}>
+                Engine
+              </Link>
+              <Link href="/gallery" className={`text-[10px] font-mono tracking-[0.3em] uppercase transition-colors ${pathname === '/gallery' ? 'text-white underline' : 'text-zinc-600 hover:text-white'}`}>
+                Gallery
+              </Link>
+            </nav>
             <div className="hidden md:flex flex-col items-end">
                <span className="text-[10px] text-white/20 font-mono tracking-[0.3em] uppercase mb-1">Status</span>
                <span className="text-xs text-white font-mono tracking-widest uppercase">System Online</span>

@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
-import { X, Video, Play, Square, Download, RefreshCw } from "lucide-react"
+import { X, Video, Play, Square, Download, RefreshCw, CloudUpload } from "lucide-react"
+import { toast } from "sonner"
 
 interface VideoToAsciiConverterProps {
   videoFile: File
@@ -178,6 +179,81 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
     URL.revokeObjectURL(url)
   }
 
+  const archiveCurrentFrame = async () => {
+    if (asciiFrames.length === 0) return
+    
+    setIsProcessing(true)
+    const toastId = toast.loading("Capturing frame for cloud archive...")
+
+    // Re-render current frame with colors for the cloud
+    if (!videoRef.current || !canvasRef.current) return
+    
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    ctx.drawImage(video, 0, 0)
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    
+    // Create a color data structure similar to ImageToAsciiConverter
+    const targetWidth = width[0]
+    const aspect = video.videoHeight / video.videoWidth
+    const targetHeight = Math.floor(targetWidth * aspect * 0.55)
+    
+    const result: { char: string; color?: string }[][] = []
+    for (let y = 0; y < targetHeight; y++) {
+      const row: { char: string; color?: string }[] = []
+      for (let x = 0; x < targetWidth; x++) {
+        const srcX = Math.floor((x * imageData.width) / targetWidth)
+        const srcY = Math.floor((y * imageData.height) / targetHeight)
+        const index = (srcY * imageData.width + srcX) * 4
+        
+        const r = imageData.data[index]
+        const g = imageData.data[index+1]
+        const b = imageData.data[index+2]
+        const avg = (r + g + b) / 3
+        const charIndex = Math.floor((avg / 255) * (ASCII_CHARS.length - 1))
+        
+        row.push({ 
+          char: ASCII_CHARS[charIndex],
+          color: `rgb(${r},${g},${b})`
+        })
+      }
+      result.push(row)
+    }
+
+    try {
+      const response = await fetch('/api/ascii', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: `Video_Frame_${Date.now().toString().slice(-4)}`,
+          asciiData: result,
+          isColor: true,
+          settings: {
+            width: width[0],
+            fps: fps[0],
+            source: videoFile.name
+          }
+        }),
+      })
+
+      const data = await response.json()
+      if (data.success) {
+        toast.success("Frame archived to community gallery", { id: toastId })
+      } else {
+        throw new Error(data.error)
+      }
+    } catch (error: any) {
+      toast.error(`Archive failed: ${error.message}`, { id: toastId })
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
   return (
     <div className="flex h-full w-full flex-col md:flex-row divide-y md:divide-y-0 md:divide-x divide-white/20">
       {/* Sidebar Controls - HUD style */}
@@ -261,6 +337,10 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
             <Button onClick={downloadAsTextSequence} disabled={asciiFrames.length === 0 || isProcessing} variant="outline" className="btn-terminal py-4 h-auto flex flex-col gap-2 rounded-none bg-black border-white/20 transition-all hover:bg-white group disabled:opacity-50">
                 <Download className="h-4 w-4 text-white group-hover:text-black" /> 
                 <span className="text-[10px] tracking-widest text-white group-hover:text-black">EXPORT</span>
+            </Button>
+            <Button onClick={archiveCurrentFrame} disabled={asciiFrames.length === 0 || isProcessing} variant="outline" className="col-span-2 btn-terminal py-4 h-auto flex gap-3 items-center justify-center rounded-none bg-black border-white/20 hover:bg-white group transition-all">
+                <CloudUpload className={`h-4 w-4 text-white group-hover:text-black ${isProcessing ? 'animate-pulse' : ''}`} /> 
+                <span className="text-[10px] tracking-[0.3em] text-white group-hover:text-black">ARCHIVE_CURRENT_FRAME</span>
             </Button>
         </div>
       </aside>
