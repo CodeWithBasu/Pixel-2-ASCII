@@ -1,13 +1,19 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 import { Analytics } from '@vercel/analytics/next'
 import { Toaster } from 'sonner'
 import './globals.css'
 
+export const viewport: Viewport = {
+  themeColor: '#000000',
+  width: 'device-width',
+  initialScale: 1,
+}
+
 export const metadata: Metadata = {
   title: 'Pixel-2-ASCII by Basudev',
-  description: 'Created by Basudev',
+  description: 'Convert images and videos to ASCII matrix art with cloud sync.',
   generator: 'basudev',
   icons: {
     icon: [
@@ -27,7 +33,6 @@ export const metadata: Metadata = {
     apple: '/apple-icon.png',
   },
   manifest: '/manifest.json',
-  themeColor: '#000000',
 }
 
 export default function RootLayout({

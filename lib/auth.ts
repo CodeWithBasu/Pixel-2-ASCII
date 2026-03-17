@@ -1,4 +1,5 @@
-import { SignJWT, jwtVerify } from "jose";
+import { SignJWT } from "jose";
+import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 
@@ -24,7 +25,7 @@ export async function verifyToken(token: string) {
 }
 
 export async function getUser() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("auth_token")?.value;
 
   if (!token) return null;
@@ -32,6 +33,6 @@ export async function getUser() {
   return await verifyToken(token);
 }
 
-export function logout() {
-  cookies().set("auth_token", "", { expires: new Date(0) });
+export async function logout() {
+  (await cookies()).set("auth_token", "", { expires: new Date(0) });
 }
