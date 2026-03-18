@@ -140,22 +140,35 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     }
   }, [processImage, loadedImage])
 
-  // Handle file loading
+  // Handle file loading robustly for mobile
   useEffect(() => {
     if (imageFile) {
-      const url = URL.createObjectURL(imageFile)
-      const img = new Image()
-      img.onload = () => {
-        setLoadedImage(img)
-        if (isMobile) setViewMode("render") 
+      const reader = new FileReader()
+      
+      reader.onload = (e) => {
+        const url = e.target?.result as string
+        if (!url) return
+        
+        const img = new Image()
+        img.onload = () => {
+          setLoadedImage(img)
+          if (isMobile) setViewMode("render") 
+        }
+        img.onerror = () => {
+          toast.error("Format error: Could not decode image data.")
+          setIsProcessing(false)
+        }
+        img.src = url
       }
-      img.onerror = () => {
-        toast.error("Format error: Image rejected by engine.")
+
+      reader.onerror = () => {
+        toast.error("Format error: Failed to read file.")
         setIsProcessing(false)
       }
-      img.src = url
+
+      reader.readAsDataURL(imageFile)
+      
       return () => {
-        URL.revokeObjectURL(url)
         setLoadedImage(null)
       }
     }
