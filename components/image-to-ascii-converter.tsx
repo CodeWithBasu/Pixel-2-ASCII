@@ -27,7 +27,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
   const { isMobile, isTablet } = useResponsive()
   const [asciiData, setAsciiData] = useState<{ char: string; color?: string }[][]>([])
   const [isProcessing, setIsProcessing] = useState(false)
-  const [width, setWidth] = useState([isMobile ? 60 : isTablet ? 100 : 120])
+  const [width, setWidth] = useState([120]) // Default, will be adjusted by useEffect
   const [charSet, setCharSet] = useState<CharSetKey>("standard")
   const [invert, setInvert] = useState(false)
   const [grayscale, setGrayscale] = useState(false)
@@ -38,6 +38,14 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
+
+  // Sync width with device type on mount/change
+  useEffect(() => {
+    const targetWidth = isMobile ? 60 : isTablet ? 100 : 120
+    if (width[0] !== targetWidth) {
+      setWidth([targetWidth])
+    }
+  }, [isMobile, isTablet])
 
   const processImage = useCallback(() => {
     if (!imageRef.current || !canvasRef.current) return
@@ -324,18 +332,18 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
             </Button>
         </div>
         
-        {/* Terminal Text Area */}
-        <div className="flex-1 overflow-auto bg-black p-4 md:p-8 custom-scrollbar relative flex items-center justify-center">
+          {/* Terminal Text Area */}
+          <div 
+            className="flex-1 overflow-auto bg-black p-4 relative flex items-center justify-center custom-scrollbar"
+            style={{ 
+              fontSize: isMobile ? '0.22rem' : isTablet ? '0.35rem' : '0.5rem',
+              lineHeight: 1
+            }}
+          >
              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-size-[20px_20px] pointer-events-none"></div>
 
              {asciiData.length > 0 ? (
-                <div 
-                  className="ascii-art cursor-default select-none border border-white/5 p-4 bg-black"
-                  style={{ 
-                    fontSize: isMobile ? '0.25rem' : isTablet ? '0.35rem' : '0.5rem',
-                    lineHeight: 1
-                  }}
-                >
+                <div className="ascii-art cursor-default select-none border border-white/5 p-4 bg-black mx-auto">
                   {asciiData.map((row, y) => (
                     <div key={y} className="flex">
                       {row.map((cell, x) => (
@@ -347,11 +355,11 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
                   ))}
                 </div>
               ) : (
-                <div className="h-full w-full flex items-center justify-center text-white/50 font-mono text-sm tracking-widest">
+                <div className="h-full w-full flex items-center justify-center text-white/50 font-mono text-sm tracking-widest min-h-[300px]">
                   {isProcessing ? "PROCESSING_MATRIX..." : "NO_DATA_AVAILABLE"}
                 </div>
               )}
-        </div>
+          </div>
       </main>
 
       <canvas ref={canvasRef} className="hidden" />
