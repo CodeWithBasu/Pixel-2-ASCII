@@ -35,6 +35,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
   const [contrast, setContrast] = useState([20]) // Default boosted slightly for deeper ASCII feel
   const [brightness, setBrightness] = useState([0])
   const [viewMode, setViewMode] = useState<"controls" | "render">("render")
+  const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null)
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
@@ -47,20 +48,25 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     }
   }, [isMobile, isTablet])
 
-  const processImage = useCallback(() => {
-    if (!imageRef.current || !canvasRef.current) return
+  const processImage = useCallback(async () => {
+    if (!loadedImage || !canvasRef.current) return
 
     setIsProcessing(true)
-    const img = imageRef.current
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext("2d", { willReadFrequently: true })
+    
+    try {
+      // Ensure image is actually decoded and ready for the GPU
+      if ('decode' in loadedImage) {
+        await loadedImage.decode().catch(() => {})
+      }
 
-    if (!ctx) {
-      setIsProcessing(false)
-      return
-    }
+      const canvas = canvasRef.current
+      const ctx = canvas.getContext("2d", { willReadFrequently: true })
+      if (!ctx) {
+        setIsProcessing(false)
+        return
+      }
 
-    const aspect = img.height / img.width
+    const aspect = loadedImage.height / loadedImage.width
     const targetWidth = Math.max(1, width[0])
     const targetHeight = Math.max(1, Math.floor(targetWidth * aspect * 0.55))
 
@@ -68,13 +74,10 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     canvas.height = targetHeight
 
     try {
-      // Safely apply filters - some mobile browsers crash on invalid filters or zero values
       ctx.filter = `brightness(${100 + brightness[0]}%) contrast(${100 + contrast[0]}%)`
-    } catch (e) {
-      console.warn("Canvas filter not supported")
-    }
+    } catch (e) {}
     
-    ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
+    ctx.drawImage(loadedImage, 0, 0, targetWidth, targetHeight)
 
     try {
       const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight)
@@ -120,29 +123,31 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
       console.error("Processing failed:", err)
       setIsProcessing(false)
     }
-  }, [width, charSet, invert, grayscale, contrast, brightness, edgeDetect])
-  // Trigger processing when dependencies change
+  }, [loadedImage, width, charSet, invert, grayscale, contrast, brightness, edgeDetect])
+
+  // Process image when parameters or image change
   useEffect(() => {
-    if (imageRef.current) {
+    if (loadedImage) {
       processImage()
     }
-  }, [processImage]) // processImage changes when any parameter (including width) changes
+  }, [processImage, loadedImage])
 
-  // Load image once on mount or file change
+  // Handle file loading
   useEffect(() => {
     if (imageFile) {
       const url = URL.createObjectURL(imageFile)
       const img = new Image()
       img.onload = () => {
-        (imageRef as React.MutableRefObject<HTMLImageElement | null>).current = img
-        processImage()
-        // Switch to render view on mobile when image loads so user sees result
+        setLoadedImage(img)
         if (isMobile) setViewMode("render") 
       }
       img.src = url
-      return () => URL.revokeObjectURL(url)
+      return () => {
+        URL.revokeObjectURL(url)
+        setLoadedImage(null)
+      }
     }
-  }, [imageFile]) // Only reload when the file itself changes, not when processing params change
+  }, [imageFile]) 
 
   const copyToClipboard = () => {
     const text = asciiData.map((row) => row.map((c) => c.char).join("")).join("\n")
@@ -378,8 +383,22 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
                   ))}
                 </div>
               ) : (
-                <div className="h-full w-full flex items-center justify-center text-white/50 font-mono text-sm tracking-widest min-h-[300px]">
-                  {isProcessing ? "PROCESSING_MATRIX..." : "NO_DATA_AVAILABLE"}
+                <div className="h-full w-full flex flex-col items-center justify-center text-white/50 font-mono text-sm tracking-widest min-h-[300px] gap-4">
+                  {isProcessing ? (
+                    "PROCESSING_MATRIX..."
+                  ) : (
+                    <>
+                      <span>NO_DATA_AVAILABLE</span>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => processImage()} 
+                        className="rounded-none border-white/20 text-[10px] uppercase tracking-widest hover:bg-white hover:text-black"
+                      >
+                        RETRY_CORE_SCAN
+                      </Button>
+                    </>
+                  )}
                 </div>
               )}
           </div>
