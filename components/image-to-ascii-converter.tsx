@@ -142,75 +142,81 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
 
   // Handle file loading robustly for mobile
   useEffect(() => {
-    if (imageFile) {
-      let isCleanedUp = false
-      let url = URL.createObjectURL(imageFile)
-      
-      const loadWithImageBitmap = async () => {
+    if (!imageFile) return
+    
+    let isCleanedUp = false
+    const originalUrl = URL.createObjectURL(imageFile)
+    const img = new Image()
+
+    img.onload = () => {
+      // Downscale to prevent GPU memory limits or canvas crashes on mobile
+      const MAX_SIZE = 1200
+      let w = img.width
+      let h = img.height
+
+      if (w > MAX_SIZE || h > MAX_SIZE) {
+        const ratio = Math.min(MAX_SIZE / w, MAX_SIZE / h)
+        w = Math.floor(w * ratio)
+        h = Math.floor(h * ratio)
+      }
+
+      const canvas = document.createElement("canvas")
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext("2d")
+
+      if (ctx) {
         try {
-          // createImageBitmap handles huge images much better than the standard Image constructor on mobile
-          const bitmap = await createImageBitmap(imageFile)
-          
-          if (isCleanedUp) {
-             bitmap.close()
-             return
-          }
-
-          // Create a dummy image element that holds the bitmap data for our canvas to draw
-          const canvas = document.createElement('canvas')
-          // Auto-downscale massive images to max 1920px to prevent mobile crash
-          const MAX_SIZE = 1920
-          let width = bitmap.width
-          let height = bitmap.height
-          
-          if (width > MAX_SIZE || height > MAX_SIZE) {
-            const ratio = Math.min(MAX_SIZE / width, MAX_SIZE / height)
-            width = Math.floor(width * ratio)
-            height = Math.floor(height * ratio)
-          }
-
-          canvas.width = width
-          canvas.height = height
-          const ctx = canvas.getContext('2d')
-          ctx?.drawImage(bitmap, 0, 0, width, height)
-          
-          const img = new Image()
-          img.onload = () => {
-             if (!isCleanedUp) {
-                setLoadedImage(img)
-                if (isMobile) setViewMode("render")
-             }
-             URL.revokeObjectURL(url)
-             bitmap.close()
-          }
-          img.src = canvas.toDataURL('image/jpeg', 0.8) // Compressed base64
-        } catch (err) {
-            // Fallback to standard objectURL if createImageBitmap fails
-            const img = new Image()
-            img.onload = () => {
-              if (!isCleanedUp) {
-                setLoadedImage(img)
-                if (isMobile) setViewMode("render") 
+          ctx.drawImage(img, 0, 0, w, h)
+          canvas.toBlob(
+            (blob) => {
+              if (blob && !isCleanedUp) {
+                const safeUrl = URL.createObjectURL(blob)
+                const safeImg = new Image()
+                safeImg.onload = () => {
+                  if (!isCleanedUp) {
+                    setLoadedImage(safeImg)
+                    if (isMobile) setViewMode("render")
+                  }
+                  URL.revokeObjectURL(safeUrl)
+                  URL.revokeObjectURL(originalUrl)
+                }
+                safeImg.src = safeUrl
+              } else {
+                URL.revokeObjectURL(originalUrl)
               }
-              URL.revokeObjectURL(url) 
-            }
-            img.onerror = () => {
-              toast.error("Format error: Image too large or corrupted.")
-              setIsProcessing(false)
-              URL.revokeObjectURL(url) 
-            }
-            img.src = url
+            },
+            "image/jpeg",
+            0.8
+          )
+        } catch (err) {
+          // If rendering fails, just fall back
+          if (!isCleanedUp) {
+            setLoadedImage(img)
+            if (isMobile) setViewMode("render")
+          }
+        }
+      } else {
+        if (!isCleanedUp) {
+          setLoadedImage(img)
+          if (isMobile) setViewMode("render")
         }
       }
-
-      loadWithImageBitmap()
-      
-      return () => {
-        isCleanedUp = true
-        setLoadedImage(null)
-      }
     }
-  }, [imageFile, isMobile]) 
+
+    img.onerror = () => {
+      toast.error("Engine failed to decode this image format.")
+      setIsProcessing(false)
+      URL.revokeObjectURL(originalUrl)
+    }
+
+    img.src = originalUrl
+
+    return () => {
+      isCleanedUp = true
+      setLoadedImage(null)
+    }
+  }, [imageFile, isMobile])
 
   const copyToClipboard = () => {
     const text = asciiData.map((row) => row.map((c) => c.char).join("")).join("\n")
