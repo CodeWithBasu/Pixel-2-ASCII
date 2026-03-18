@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Copy, Download, Share2, RefreshCw, X, Image as ImageIcon, CloudUpload } from "lucide-react"
 import { toast } from "sonner"
 import { useResponsive } from "@/hooks/use-responsive"
-import heic2any from "heic2any"
 
 interface ImageToAsciiConverterProps {
   imageFile: File
@@ -160,6 +159,8 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
       ) {
         toast.info("Converting HEIC format...", { id: "heic-convert" })
         try {
+          // Dynamic import prevents SSR "window is not defined" error during Next.js build
+          const heic2any = (await import("heic2any")).default
           const converted = await heic2any({ blob: imageFile, toType: "image/jpeg", quality: 0.8 })
           processBlob = Array.isArray(converted) ? converted[0] : converted
           toast.success("HEIC converted.", { id: "heic-convert" })
