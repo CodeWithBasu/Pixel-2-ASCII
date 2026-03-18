@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Copy, Download, Share2, RefreshCw, X, Image as ImageIcon, CloudUpload } from "lucide-react"
 import { toast } from "sonner"
 import { useResponsive } from "@/hooks/use-responsive"
+import heic2any from "heic2any"
 
 interface ImageToAsciiConverterProps {
   imageFile: File
@@ -145,8 +146,36 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     if (!imageFile) return
     
     let isCleanedUp = false
-    const originalUrl = URL.createObjectURL(imageFile)
+    let originalUrl = ""
     const img = new Image()
+
+    const initLoad = async () => {
+      let processBlob: Blob | File = imageFile
+
+      // Detect and convert HEIC formats commonly found on iOS
+      if (
+        imageFile.type === "image/heic" || 
+        imageFile.type === "image/heif" || 
+        imageFile.name.toLowerCase().endsWith(".heic")
+      ) {
+        toast.info("Converting HEIC format...", { id: "heic-convert" })
+        try {
+          const converted = await heic2any({ blob: imageFile, toType: "image/jpeg", quality: 0.8 })
+          processBlob = Array.isArray(converted) ? converted[0] : converted
+          toast.success("HEIC converted.", { id: "heic-convert" })
+        } catch (err) {
+          console.error("HEIC conversion failed:", err)
+          toast.error("Failed to convert HEIC format.", { id: "heic-convert" })
+          setIsProcessing(false)
+          return
+        }
+      }
+
+      if (isCleanedUp) return
+
+      originalUrl = URL.createObjectURL(processBlob)
+      img.src = originalUrl
+    }
 
     img.onload = () => {
       // Downscale to prevent GPU memory limits or canvas crashes on mobile
@@ -207,14 +236,17 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     img.onerror = () => {
       toast.error("Engine failed to decode this image format.")
       setIsProcessing(false)
-      URL.revokeObjectURL(originalUrl)
+      if (originalUrl) URL.revokeObjectURL(originalUrl)
     }
 
-    img.src = originalUrl
+    initLoad()
 
     return () => {
       isCleanedUp = true
       setLoadedImage(null)
+      if (originalUrl) {
+         URL.revokeObjectURL(originalUrl)
+      }
     }
   }, [imageFile, isMobile])
 
