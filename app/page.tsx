@@ -89,7 +89,7 @@ export default function HomePage() {
               transition={{ duration: 0.8, ease: "easeOut" }}
               className="flex flex-col items-center gap-8"
             >
-              <img src="/hero.png" alt="ASCII_CORE" className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.15)]" />
+              <img src="/app-icon.png" alt="ASCII_CORE" className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.15)]" />
               
               <div className="flex flex-col items-center gap-4">
                  <div className="text-white/60 tracking-[0.6em] font-mono text-[10px] uppercase">

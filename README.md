@@ -1,7 +1,7 @@
 # 🌌 ASCII Studio
 
 <div align="center">
-  <img src="public/hero.png" alt="ASCII Studio Hero" width="200"/>
+  <img src="public/app-icon.png" alt="ASCII Studio Hero" width="200"/>
   <br/>
   <strong>A High-Performance Web Application for Digital Artists and Terminal Enthusiasts</strong>
 </div>

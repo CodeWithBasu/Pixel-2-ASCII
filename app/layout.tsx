@@ -16,9 +16,9 @@ export const metadata: Metadata = {
   description: 'Convert images and videos to ASCII matrix art with cloud sync.',
   generator: 'basudev',
   icons: {
-    icon: '/hero.png?v=2',
-    apple: '/hero.png?v=2',
-    shortcut: '/hero.png?v=2',
+    icon: '/app-icon.png?v=3',
+    apple: '/app-icon.png?v=3',
+    shortcut: '/app-icon.png?v=3',
   },
   manifest: '/manifest.json',
 }

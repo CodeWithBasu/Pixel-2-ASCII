@@ -57,7 +57,7 @@ export function TerminalHeader() {
           <Link href="/" className="flex items-center gap-4 text-white font-black tracking-tighter text-3xl uppercase hover:opacity-80 transition-opacity">
             <div className="relative w-10 h-10 overflow-hidden border border-white/20">
               <Image 
-                src="/hero.png" 
+                src="/app-icon.png" 
                 alt="Logo" 
                 fill 
                 className="object-cover"
