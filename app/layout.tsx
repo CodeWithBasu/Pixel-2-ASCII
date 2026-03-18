@@ -20,6 +20,9 @@ export const metadata: Metadata = {
     apple: '/app-icon.png?v=3',
     shortcut: '/app-icon.png?v=3',
   },
+  openGraph: {
+    images: ['/app-icon.png?v=3'],
+  },
   manifest: '/manifest.json',
 }
 
