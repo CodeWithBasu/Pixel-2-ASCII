@@ -61,17 +61,24 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     }
 
     const aspect = img.height / img.width
-    const targetWidth = width[0]
-    const targetHeight = Math.floor(targetWidth * aspect * 0.55)
+    const targetWidth = Math.max(1, width[0])
+    const targetHeight = Math.max(1, Math.floor(targetWidth * aspect * 0.55))
 
     canvas.width = targetWidth
     canvas.height = targetHeight
 
-    ctx.filter = `brightness(${100 + brightness[0]}%) contrast(${100 + contrast[0]}%)`
+    try {
+      // Safely apply filters - some mobile browsers crash on invalid filters or zero values
+      ctx.filter = `brightness(${100 + brightness[0]}%) contrast(${100 + contrast[0]}%)`
+    } catch (e) {
+      console.warn("Canvas filter not supported")
+    }
+    
     ctx.drawImage(img, 0, 0, targetWidth, targetHeight)
 
-    const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight)
-    const { data } = imageData
+    try {
+      const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight)
+      const { data } = imageData
     const chars = CHARACTER_SETS[charSet]
     const result: { char: string; color?: string }[][] = []
 
@@ -109,6 +116,10 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
 
     setAsciiData(result)
     setIsProcessing(false)
+    } catch (err) {
+      console.error("Processing failed:", err)
+      setIsProcessing(false)
+    }
   }, [width, charSet, invert, grayscale, contrast, brightness, edgeDetect])
   // Trigger processing when dependencies change
   useEffect(() => {
@@ -374,7 +385,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
           </div>
       </main>
 
-      <canvas ref={canvasRef} className="hidden" />
+      <canvas ref={canvasRef} style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', zIndex: -1 }} />
     </div>
   )
 }
