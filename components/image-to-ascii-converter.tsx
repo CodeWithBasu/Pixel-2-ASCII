@@ -60,8 +60,17 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     // Yield to the main thread so mobile browsers can render the "PROCESSING..." UI
     setTimeout(() => {
       try {
-        const canvas = document.createElement("canvas")
-        const ctx = canvas.getContext("2d", { willReadFrequently: true })
+        let canvas: HTMLCanvasElement | OffscreenCanvas
+        let ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null
+
+        if (typeof OffscreenCanvas !== 'undefined') {
+          canvas = new OffscreenCanvas(Math.max(1, width[0]), Math.max(1, width[0]))
+          ctx = canvas.getContext("2d", { willReadFrequently: true }) as OffscreenCanvasRenderingContext2D | null
+        } else {
+          canvas = document.createElement("canvas")
+          ctx = canvas.getContext("2d", { willReadFrequently: true })
+        }
+        
         if (!ctx) {
           setIsProcessing(false)
           return
@@ -136,9 +145,14 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     if (imageFile) {
       const url = URL.createObjectURL(imageFile)
       const img = new Image()
+      img.crossOrigin = "Anonymous" // Add this for mobile security policies
       img.onload = () => {
         setLoadedImage(img)
         if (isMobile) setViewMode("render") 
+      }
+      img.onerror = () => {
+        toast.error("Format error: Image rejected by engine.")
+        setIsProcessing(false)
       }
       img.src = url
       return () => {
