@@ -143,26 +143,67 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
   // Handle file loading robustly for mobile
   useEffect(() => {
     if (imageFile) {
-      const url = URL.createObjectURL(imageFile)
-      const img = new Image()
-      
       let isCleanedUp = false
+      let url = URL.createObjectURL(imageFile)
+      
+      const loadWithImageBitmap = async () => {
+        try {
+          // createImageBitmap handles huge images much better than the standard Image constructor on mobile
+          const bitmap = await createImageBitmap(imageFile)
+          
+          if (isCleanedUp) {
+             bitmap.close()
+             return
+          }
 
-      img.onload = () => {
-        if (!isCleanedUp) {
-          setLoadedImage(img)
-          if (isMobile) setViewMode("render") 
+          // Create a dummy image element that holds the bitmap data for our canvas to draw
+          const canvas = document.createElement('canvas')
+          // Auto-downscale massive images to max 1920px to prevent mobile crash
+          const MAX_SIZE = 1920
+          let width = bitmap.width
+          let height = bitmap.height
+          
+          if (width > MAX_SIZE || height > MAX_SIZE) {
+            const ratio = Math.min(MAX_SIZE / width, MAX_SIZE / height)
+            width = Math.floor(width * ratio)
+            height = Math.floor(height * ratio)
+          }
+
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          ctx?.drawImage(bitmap, 0, 0, width, height)
+          
+          const img = new Image()
+          img.onload = () => {
+             if (!isCleanedUp) {
+                setLoadedImage(img)
+                if (isMobile) setViewMode("render")
+             }
+             URL.revokeObjectURL(url)
+             bitmap.close()
+          }
+          img.src = canvas.toDataURL('image/jpeg', 0.8) // Compressed base64
+        } catch (err) {
+            // Fallback to standard objectURL if createImageBitmap fails
+            const img = new Image()
+            img.onload = () => {
+              if (!isCleanedUp) {
+                setLoadedImage(img)
+                if (isMobile) setViewMode("render") 
+              }
+              URL.revokeObjectURL(url) 
+            }
+            img.onerror = () => {
+              toast.error("Format error: Image too large or corrupted.")
+              setIsProcessing(false)
+              URL.revokeObjectURL(url) 
+            }
+            img.src = url
         }
-        URL.revokeObjectURL(url) // Revoke ONLY after decoded
       }
-      
-      img.onerror = () => {
-        toast.error("Format error: Image rejected by engine.")
-        setIsProcessing(false)
-        URL.revokeObjectURL(url) // Clean up on error too
-      }
-      
-      img.src = url
+
+      loadWithImageBitmap()
       
       return () => {
         isCleanedUp = true
