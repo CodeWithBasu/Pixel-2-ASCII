@@ -37,7 +37,6 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
   const [viewMode, setViewMode] = useState<"controls" | "render">("render")
   const [loadedImage, setLoadedImage] = useState<HTMLImageElement | null>(null)
 
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
 
   // Sync width with device type on mount/change
@@ -48,39 +47,41 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     }
   }, [isMobile, isTablet])
 
-  const processImage = useCallback(async () => {
-    if (!loadedImage || !canvasRef.current) return
+  const processImage = useCallback(() => {
+    if (!loadedImage) return
+
+    if (loadedImage.width === 0 || loadedImage.height === 0) {
+      console.warn("Image not fully initialized by mobile browser yet.")
+      return
+    }
 
     setIsProcessing(true)
     
-    try {
-      // Ensure image is actually decoded and ready for the GPU
-      if ('decode' in loadedImage) {
-        await loadedImage.decode().catch(() => {})
-      }
-
-      const canvas = canvasRef.current
-      const ctx = canvas.getContext("2d", { willReadFrequently: true })
-      if (!ctx) {
-        setIsProcessing(false)
-        return
-      }
-
-    const aspect = loadedImage.height / loadedImage.width
-    const targetWidth = Math.max(1, width[0])
-    const targetHeight = Math.max(1, Math.floor(targetWidth * aspect * 0.55))
-
-    canvas.width = targetWidth
-    canvas.height = targetHeight
-
+    // Yield to the main thread so mobile browsers can render the "PROCESSING..." UI
+    setTimeout(() => {
       try {
-        ctx.filter = `brightness(${100 + brightness[0]}%) contrast(${100 + contrast[0]}%)`
-      } catch (e) {}
-      
-      ctx.drawImage(loadedImage, 0, 0, targetWidth, targetHeight)
+        const canvas = document.createElement("canvas")
+        const ctx = canvas.getContext("2d", { willReadFrequently: true })
+        if (!ctx) {
+          setIsProcessing(false)
+          return
+        }
 
-      const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight)
-      const { data } = imageData
+        const aspect = loadedImage.height / loadedImage.width
+        const targetWidth = Math.max(1, width[0])
+        const targetHeight = Math.max(1, Math.floor(targetWidth * aspect * 0.55))
+
+        canvas.width = targetWidth
+        canvas.height = targetHeight
+
+        try {
+          ctx.filter = `brightness(${100 + brightness[0]}%) contrast(${100 + contrast[0]}%)`
+        } catch (e) {}
+        
+        ctx.drawImage(loadedImage, 0, 0, targetWidth, targetHeight)
+
+        const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight)
+        const { data } = imageData
       const chars = CHARACTER_SETS[charSet]
       const result: { char: string; color?: string }[][] = []
 
@@ -120,6 +121,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     } finally {
       setIsProcessing(false)
     }
+    }, 50) // 50ms delay gives physical device time to paint
   }, [loadedImage, width, charSet, invert, grayscale, contrast, brightness, edgeDetect])
 
   // Process image when parameters or image change
@@ -400,8 +402,6 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
               )}
           </div>
       </main>
-
-      <canvas ref={canvasRef} style={{ position: 'absolute', opacity: 0, pointerEvents: 'none', zIndex: -1 }} />
     </div>
   )
 }
