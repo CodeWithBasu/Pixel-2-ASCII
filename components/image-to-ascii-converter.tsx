@@ -145,7 +145,6 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     if (imageFile) {
       const url = URL.createObjectURL(imageFile)
       const img = new Image()
-      img.crossOrigin = "Anonymous" // Add this for mobile security policies
       img.onload = () => {
         setLoadedImage(img)
         if (isMobile) setViewMode("render") 
