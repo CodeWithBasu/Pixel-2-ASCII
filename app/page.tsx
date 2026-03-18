@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import { VideoToAsciiConverter } from "@/components/video-to-ascii-converter"
 import { ImageToAsciiConverter } from "@/components/image-to-ascii-converter"
 import { TerminalHeader } from "@/components/terminal-header"
@@ -14,11 +14,19 @@ export default function HomePage() {
   const [videoFile, setVideoFile] = useState<File | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [activeMode, setActiveMode] = useState<"video" | "image">("image")
+  const [showSplash, setShowSplash] = useState(true)
   
   const { isMobile, isTablet } = useResponsive()
   
   const videoInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false)
+    }, 2500)
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleVideoSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -67,6 +75,40 @@ export default function HomePage() {
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-black text-white selection:bg-white selection:text-black font-sans flex flex-col relative">
+      <AnimatePresence>
+        {showSplash && (
+          <motion.div 
+            className="fixed inset-0 z-100 flex items-center justify-center bg-black"
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="flex flex-col items-center gap-8"
+            >
+              <img src="/hero.png" alt="ASCII_CORE" className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.15)]" />
+              
+              <div className="flex flex-col items-center gap-4">
+                 <div className="text-white/60 tracking-[0.6em] font-mono text-[10px] uppercase">
+                    INITIALIZING_CORE //
+                 </div>
+                 <div className="w-48 h-px bg-white/10 relative overflow-hidden">
+                    <motion.div 
+                      className="absolute top-0 left-0 h-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+                      initial={{ width: "0%" }}
+                      animate={{ width: "100%" }}
+                      transition={{ duration: 2, ease: "circInOut" }}
+                    />
+                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="fixed inset-0 pointer-events-none z-0 opacity-80">
          <Meteors number={35} />
       </div>
