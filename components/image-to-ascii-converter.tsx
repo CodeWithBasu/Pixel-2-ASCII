@@ -55,7 +55,10 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     const canvas = canvasRef.current
     const ctx = canvas.getContext("2d", { willReadFrequently: true })
 
-    if (!ctx) return
+    if (!ctx) {
+      setIsProcessing(false)
+      return
+    }
 
     const aspect = img.height / img.width
     const targetWidth = width[0]
@@ -107,7 +110,14 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     setAsciiData(result)
     setIsProcessing(false)
   }, [width, charSet, invert, grayscale, contrast, brightness, edgeDetect])
+  // Trigger processing when dependencies change
+  useEffect(() => {
+    if (imageRef.current) {
+      processImage()
+    }
+  }, [processImage]) // processImage changes when any parameter (including width) changes
 
+  // Load image once on mount or file change
   useEffect(() => {
     if (imageFile) {
       const url = URL.createObjectURL(imageFile)
@@ -115,11 +125,13 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
       img.onload = () => {
         (imageRef as React.MutableRefObject<HTMLImageElement | null>).current = img
         processImage()
+        // Switch to render view on mobile when image loads so user sees result
+        if (isMobile) setViewMode("render") 
       }
       img.src = url
       return () => URL.revokeObjectURL(url)
     }
-  }, [imageFile, processImage])
+  }, [imageFile]) // Only reload when the file itself changes, not when processing params change
 
   const copyToClipboard = () => {
     const text = asciiData.map((row) => row.map((c) => c.char).join("")).join("\n")
