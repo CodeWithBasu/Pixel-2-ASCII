@@ -143,36 +143,33 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
   // Handle file loading robustly for mobile
   useEffect(() => {
     if (imageFile) {
-      const reader = new FileReader()
+      const url = URL.createObjectURL(imageFile)
+      const img = new Image()
       
-      reader.onload = (e) => {
-        const url = e.target?.result as string
-        if (!url) return
-        
-        const img = new Image()
-        img.onload = () => {
+      let isCleanedUp = false
+
+      img.onload = () => {
+        if (!isCleanedUp) {
           setLoadedImage(img)
           if (isMobile) setViewMode("render") 
         }
-        img.onerror = () => {
-          toast.error("Format error: Could not decode image data.")
-          setIsProcessing(false)
-        }
-        img.src = url
+        URL.revokeObjectURL(url) // Revoke ONLY after decoded
       }
-
-      reader.onerror = () => {
-        toast.error("Format error: Failed to read file.")
+      
+      img.onerror = () => {
+        toast.error("Format error: Image rejected by engine.")
         setIsProcessing(false)
+        URL.revokeObjectURL(url) // Clean up on error too
       }
-
-      reader.readAsDataURL(imageFile)
+      
+      img.src = url
       
       return () => {
+        isCleanedUp = true
         setLoadedImage(null)
       }
     }
-  }, [imageFile]) 
+  }, [imageFile, isMobile]) 
 
   const copyToClipboard = () => {
     const text = asciiData.map((row) => row.map((c) => c.char).join("")).join("\n")
