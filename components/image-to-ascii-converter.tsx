@@ -73,54 +73,51 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     canvas.width = targetWidth
     canvas.height = targetHeight
 
-    try {
-      ctx.filter = `brightness(${100 + brightness[0]}%) contrast(${100 + contrast[0]}%)`
-    } catch (e) {}
-    
-    ctx.drawImage(loadedImage, 0, 0, targetWidth, targetHeight)
+      try {
+        ctx.filter = `brightness(${100 + brightness[0]}%) contrast(${100 + contrast[0]}%)`
+      } catch (e) {}
+      
+      ctx.drawImage(loadedImage, 0, 0, targetWidth, targetHeight)
 
-    try {
       const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight)
       const { data } = imageData
-    const chars = CHARACTER_SETS[charSet]
-    const result: { char: string; color?: string }[][] = []
+      const chars = CHARACTER_SETS[charSet]
+      const result: { char: string; color?: string }[][] = []
 
-    for (let y = 0; y < targetHeight; y++) {
-      const row: { char: string; color?: string }[] = []
-      for (let x = 0; x < targetWidth; x++) {
-        const i = (y * targetWidth + x) * 4
-        let r = data[i]
-        let g = data[i + 1]
-        let b = data[i + 2]
+      for (let y = 0; y < targetHeight; y++) {
+        const row: { char: string; color?: string }[] = []
+        for (let x = 0; x < targetWidth; x++) {
+          const i = (y * targetWidth + x) * 4
+          let r = data[i]
+          let g = data[i + 1]
+          let b = data[i + 2]
 
-        // Simple edge detection simulation if toggled
-        if (edgeDetect && x > 0 && y > 0) {
-            const topI = ((y-1) * targetWidth + x) * 4
-            const leftI = (y * targetWidth + (x-1)) * 4
-            const diff = Math.abs(r - data[leftI]) + Math.abs(r - data[topI])
-            // Override r,g,b with diff based intensity
-            r = g = b = Math.min(255, diff * 2) 
+          if (edgeDetect && x > 0 && y > 0) {
+              const topI = ((y-1) * targetWidth + x) * 4
+              const leftI = (y * targetWidth + (x-1)) * 4
+              const diff = Math.abs(r - data[leftI]) + Math.abs(r - data[topI])
+              r = g = b = Math.min(255, diff * 2) 
+          }
+
+          let avg = (r + g + b) / 3
+          if (invert) avg = 255 - avg
+
+          const charIndex = Math.floor((avg / 255) * (chars.length - 1))
+          const char = chars[charIndex]
+
+          if (grayscale) {
+            row.push({ char })
+          } else {
+            row.push({ char, color: `rgb(${r},${g},${b})` })
+          }
         }
-
-        let avg = (r + g + b) / 3
-        if (invert) avg = 255 - avg
-
-        const charIndex = Math.floor((avg / 255) * (chars.length - 1))
-        const char = chars[charIndex]
-
-        if (grayscale) {
-          row.push({ char })
-        } else {
-          row.push({ char, color: `rgb(${r},${g},${b})` })
-        }
+        result.push(row)
       }
-      result.push(row)
-    }
 
-    setAsciiData(result)
-    setIsProcessing(false)
+      setAsciiData(result)
     } catch (err) {
       console.error("Processing failed:", err)
+    } finally {
       setIsProcessing(false)
     }
   }, [loadedImage, width, charSet, invert, grayscale, contrast, brightness, edgeDetect])
