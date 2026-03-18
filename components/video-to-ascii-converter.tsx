@@ -26,7 +26,6 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
   const [fps, setFps] = useState([12])
 
   const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const intervalRef = useRef<NodeJS.Timeout>()
 
   const convertFrameToAscii = useCallback((imageData: ImageData, width: number) => {
@@ -84,7 +83,9 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
   }, [])
 
   const processVideo = useCallback(async () => {
-    if (!videoRef.current || !canvasRef.current) return
+    if (!videoRef.current) return
+
+    if (isMobile) setViewMode("render")
 
     setIsProcessing(true)
     setProgress(0)
@@ -93,7 +94,7 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
     stopAsciiVideo()
 
     const video = videoRef.current
-    const canvas = canvasRef.current
+    const canvas = document.createElement("canvas")
     const ctx = canvas.getContext("2d", { willReadFrequently: true })
 
     if (!ctx) return
@@ -189,10 +190,10 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
     const toastId = toast.loading("Capturing frame for cloud archive...")
 
     // Re-render current frame with colors for the cloud
-    if (!videoRef.current || !canvasRef.current) return
+    if (!videoRef.current) return
     
     const video = videoRef.current
-    const canvas = canvasRef.current
+    const canvas = document.createElement("canvas")
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
@@ -390,26 +391,26 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
         </div>
         
         {/* Terminal Text Area */}
-        <div className="flex-1 overflow-auto bg-black p-4 md:p-8 custom-scrollbar relative">
+        <div 
+          className="flex-1 overflow-auto bg-black p-4 relative flex items-center justify-center custom-scrollbar"
+          style={{ 
+            fontSize: isMobile ? '0.35rem' : isTablet ? '0.5rem' : '0.65rem'
+          }}
+        >
              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-size-[20px_20px] pointer-events-none"></div>
 
              {asciiFrames.length > 0 ? (
-                <div 
-            className="flex-1 overflow-auto bg-black p-4 flex items-center justify-center custom-scrollbar"
-            style={{ 
-              fontSize: isMobile ? '0.35rem' : isTablet ? '0.5rem' : '0.65rem'
-            }}
-          >
-            <pre className="font-mono leading-[0.8] whitespace-pre border border-white/5 p-4 bg-black select-none grayscale contrast-125">
-              {asciiFrames[currentFrame]}
-            </pre>
-          </div>
+                <div className="ascii-art cursor-default select-none border border-white/5 p-4 bg-black mx-auto">
+                   <pre className="font-mono leading-[0.8] whitespace-pre select-none grayscale contrast-125">
+                     {asciiFrames[currentFrame]}
+                   </pre>
+                </div>
               ) : (
-                <div className="h-full w-full flex items-center justify-center text-primary/50 font-mono text-sm tracking-widest">
+                <div className="h-full w-full flex items-center justify-center text-primary/50 font-mono text-sm tracking-widest min-h-[300px]">
                   {isProcessing ? (
                       <div className="flex flex-col items-center gap-4">
                           <RefreshCw className="h-8 w-8 animate-spin" />
-                          <span>EXTRACTING_MATRIX_DATA</span>
+                          <span>EXTRACTING_MATRIX_DATA // {progress}%</span>
                       </div>
                   ) : "SYSTEM_STANDBY"}
                 </div>
@@ -419,7 +420,6 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
 
       {/* Hidden processing elements */}
       <video ref={videoRef} className="hidden" muted preload="metadata" />
-      <canvas ref={canvasRef} className="hidden" />
     </div>
   )
 }
