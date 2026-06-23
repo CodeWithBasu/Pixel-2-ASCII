@@ -16,7 +16,7 @@ export default function HomePage() {
   const [activeMode, setActiveMode] = useState<"video" | "image">("image")
   const [showSplash, setShowSplash] = useState(true)
   
-  const { isMobile, isTablet } = useResponsive()
+  const { isMobile, isTablet, isShortScreen } = useResponsive()
   
   const videoInputRef = useRef<HTMLInputElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
@@ -116,7 +116,7 @@ export default function HomePage() {
       <div className="relative z-10 flex flex-col h-full w-full overflow-y-auto md:overflow-hidden lg:max-w-7xl lg:mx-auto">
         <TerminalHeader />
 
-        <main className="flex-1 flex flex-col p-4 md:p-12 lg:p-16 min-h-0">
+        <main className={`flex-1 flex flex-col min-h-0 transition-all duration-500 ${isShortScreen ? 'p-2 md:p-4 lg:p-6' : 'p-4 md:p-12 lg:p-16'}`}>
         <AnimatePresence mode="wait">
           {(!videoFile && !imageFile) ? (
             <motion.div 
@@ -125,10 +125,10 @@ export default function HomePage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="flex-1 flex flex-col items-center justify-between w-full max-w-6xl mx-auto py-8 px-4"
+              className={`flex-1 flex flex-col items-center justify-between w-full max-w-6xl mx-auto px-4 transition-all duration-500 ${isShortScreen ? 'py-2' : 'py-8'}`}
             >
-               <div className="text-center space-y-3 w-full mix-blend-difference mb-8">
-                  <h1 className="text-5xl sm:text-7xl md:text-8xl xl:text-9xl font-black tracking-tighter uppercase leading-[0.95] mb-2">
+               <div className={`text-center w-full mix-blend-difference transition-all duration-500 ${isShortScreen ? 'space-y-1 mb-4' : 'space-y-3 mb-8'}`}>
+                  <h1 className={`font-black tracking-tighter uppercase leading-[0.95] transition-all duration-500 ${isShortScreen ? 'text-4xl sm:text-6xl md:text-7xl xl:text-8xl mb-1' : 'text-5xl sm:text-7xl md:text-8xl xl:text-9xl mb-2'}`}>
                     Ascii<br />Generator
                   </h1>
                   <p className="text-[10px] sm:text-xs md:text-base text-zinc-500 font-mono tracking-[0.3em] uppercase max-w-xs sm:max-w-md mx-auto opacity-60">
@@ -142,7 +142,7 @@ export default function HomePage() {
                   onDragOver={handleDragOver}
                >
                   <div 
-                    className="p-6 md:p-8 border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between h-48 md:h-56 group"
+                    className={`border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between group ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}
                     onClick={() => imageInputRef.current?.click()}
                   >
                     <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">01 // Format</div>
@@ -153,7 +153,7 @@ export default function HomePage() {
                   </div>
                   
                   <div 
-                    className="p-6 md:p-8 border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between h-48 md:h-56 group"
+                    className={`border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between group ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}
                     onClick={() => videoInputRef.current?.click()}
                   >
                     <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">02 // Format</div>
@@ -167,7 +167,7 @@ export default function HomePage() {
                <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
                <input ref={videoInputRef} type="file" accept="video/*" onChange={handleVideoSelect} className="hidden" />
                
-               <div className="w-full flex flex-col md:flex-row justify-between items-center border-t border-white/5 py-8 gap-6 mt-12 mb-4">
+               <div className={`w-full flex flex-col md:flex-row justify-between items-center border-t border-white/5 transition-all duration-500 ${isShortScreen ? 'py-4 gap-4 mt-6 mb-2' : 'py-8 gap-6 mt-12 mb-4'}`}>
                  <div className="flex flex-col items-center md:items-start gap-1">
                    {/* ... credit content ... */}
                    <div className="text-[9px] font-mono uppercase tracking-[0.4em] text-zinc-600">Build // 2.0.4</div>
