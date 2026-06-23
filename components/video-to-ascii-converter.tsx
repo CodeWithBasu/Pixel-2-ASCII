@@ -307,7 +307,7 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
       )}
 
       {/* Sidebar Controls - HUD style */}
-      <aside className={`${isMobile && viewMode !== 'controls' ? 'hidden' : 'flex'} w-full md:w-80 lg:w-96 shrink-0 bg-black flex flex-col h-auto md:h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/10 uppercase tracking-tighter`}>
+      <aside className={`${isMobile && viewMode !== 'controls' ? 'hidden' : 'flex'} w-full md:w-80 lg:w-96 shrink-0 bg-black/40 backdrop-blur-md flex flex-col h-auto md:h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/10 uppercase tracking-tighter`}>
         <div className="flex items-center justify-between mb-10">
             <div className="flex items-center gap-3 text-white">
                 <Video className="w-5 h-5"/>
@@ -408,9 +408,9 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
       </aside>
 
       {/* Main ASCII Canvas Viewport */}
-      <main className={`${isMobile && viewMode !== 'render' ? 'hidden' : 'flex'} flex-1 bg-black overflow-hidden relative flex flex-col`}>
+      <main className={`${isMobile && viewMode !== 'render' ? 'hidden' : 'flex'} flex-1 bg-black/40 backdrop-blur-md overflow-hidden relative flex flex-col`}>
         {/* Viewport Header */}
-        <div className="h-10 bg-black border-b border-white/10 flex items-center justify-between px-4 sticky top-0 z-20">
+        <div className="h-10 bg-black/40 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-4 sticky top-0 z-20">
             <div className="flex gap-4">
                 <Button variant="ghost" size="sm" onClick={onReset} className="h-6 px-2 rounded-none text-[10px] font-mono tracking-widest text-white/40 hover:bg-white hover:text-black transition-colors hidden md:flex">
                    <ArrowLeft className="w-3 h-3 mr-2" /> BACK
@@ -437,7 +437,7 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
         
         {/* Terminal Text Area */}
         <div 
-          className="flex-1 overflow-auto bg-black p-4 relative flex items-center justify-center custom-scrollbar"
+          className="flex-1 overflow-auto bg-transparent p-4 relative flex items-center justify-center custom-scrollbar"
           style={{ 
             fontSize: isMobile ? '0.35rem' : isTablet ? '0.5rem' : '0.65rem'
           }}
@@ -445,7 +445,7 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-size-[20px_20px] pointer-events-none"></div>
 
              {asciiFrames.length > 0 ? (
-                <div className="ascii-art cursor-default select-none border border-white/5 p-4 bg-black mx-auto">
+                <div className="ascii-art cursor-default select-none border border-white/5 p-4 bg-black/40 backdrop-blur-sm mx-auto">
                    <pre className="font-mono leading-[0.8] whitespace-pre select-none grayscale contrast-125">
                      {asciiFrames[currentFrame]}
                    </pre>
