@@ -123,7 +123,7 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
       </svg>
     `;
 
-    return \`data:image/svg+xml,\${encodeURIComponent(svgContent)}\`;
+    return `data:image/svg+xml,${encodeURIComponent(svgContent)}`;
   };
 
   const updateDisplacementMap = () => {
@@ -198,7 +198,7 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     }
 
     const div = document.createElement('div');
-    div.style.backdropFilter = \`url(#\${filterId})\`;
+    div.style.backdropFilter = `url(#${filterId})`;
 
     return div.style.backdropFilter !== '';
   };
@@ -211,9 +211,9 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   const getContainerStyles = (): React.CSSProperties => {
     const baseStyles: React.CSSProperties = {
       ...style,
-      width: typeof width === 'number' ? \`\${width}px\` : width,
-      height: typeof height === 'number' ? \`\${height}px\` : height,
-      borderRadius: \`\${borderRadius}px\`,
+      width: typeof width === 'number' ? `${width}px` : width,
+      height: typeof height === 'number' ? `${height}px` : height,
+      borderRadius: `${borderRadius}px`,
       '--glass-frost': backgroundOpacity,
       '--glass-saturation': saturation
     } as React.CSSProperties;
@@ -223,25 +223,25 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     if (svgSupported) {
       return {
         ...baseStyles,
-        background: isDarkMode ? \`hsl(0 0% 0% / \${backgroundOpacity})\` : \`hsl(0 0% 100% / \${backgroundOpacity})\`,
-        backdropFilter: \`url(#\${filterId}) saturate(\${saturation})\`,
+        background: isDarkMode ? `hsl(0 0% 0% / ${backgroundOpacity})` : `hsl(0 0% 100% / ${backgroundOpacity})`,
+        backdropFilter: `url(#${filterId}) saturate(${saturation})`,
         boxShadow: isDarkMode
-          ? \`0 0 2px 1px color-mix(in oklch, white, transparent 65%) inset,
+          ? `0 0 2px 1px color-mix(in oklch, white, transparent 65%) inset,
              0 0 10px 4px color-mix(in oklch, white, transparent 85%) inset,
              0px 4px 16px rgba(17, 17, 26, 0.05),
              0px 8px 24px rgba(17, 17, 26, 0.05),
              0px 16px 56px rgba(17, 17, 26, 0.05),
              0px 4px 16px rgba(17, 17, 26, 0.05) inset,
              0px 8px 24px rgba(17, 17, 26, 0.05) inset,
-             0px 16px 56px rgba(17, 17, 26, 0.05) inset\`
-          : \`0 0 2px 1px color-mix(in oklch, black, transparent 85%) inset,
+             0px 16px 56px rgba(17, 17, 26, 0.05) inset`
+          : `0 0 2px 1px color-mix(in oklch, black, transparent 85%) inset,
              0 0 10px 4px color-mix(in oklch, black, transparent 90%) inset,
              0px 4px 16px rgba(17, 17, 26, 0.05),
              0px 8px 24px rgba(17, 17, 26, 0.05),
              0px 16px 56px rgba(17, 17, 26, 0.05),
              0px 4px 16px rgba(17, 17, 26, 0.05) inset,
              0px 8px 24px rgba(17, 17, 26, 0.05) inset,
-             0px 16px 56px rgba(17, 17, 26, 0.05) inset\`
+             0px 16px 56px rgba(17, 17, 26, 0.05) inset`
       };
     } else {
       if (isDarkMode) {
@@ -250,8 +250,8 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
             ...baseStyles,
             background: 'rgba(0, 0, 0, 0.4)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: \`inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
-                        inset 0 -1px 0 0 rgba(255, 255, 255, 0.1)\`
+            boxShadow: `inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
+                        inset 0 -1px 0 0 rgba(255, 255, 255, 0.1)`
           };
         } else {
           return {
@@ -260,8 +260,8 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
             backdropFilter: 'blur(12px) saturate(1.8) brightness(1.2)',
             WebkitBackdropFilter: 'blur(12px) saturate(1.8) brightness(1.2)',
             border: '1px solid rgba(255, 255, 255, 0.2)',
-            boxShadow: \`inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
-                        inset 0 -1px 0 0 rgba(255, 255, 255, 0.1)\`
+            boxShadow: `inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
+                        inset 0 -1px 0 0 rgba(255, 255, 255, 0.1)`
           };
         }
       } else {
@@ -270,8 +270,8 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
             ...baseStyles,
             background: 'rgba(255, 255, 255, 0.4)',
             border: '1px solid rgba(255, 255, 255, 0.3)',
-            boxShadow: \`inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
-                        inset 0 -1px 0 0 rgba(255, 255, 255, 0.3)\`
+            boxShadow: `inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+                        inset 0 -1px 0 0 rgba(255, 255, 255, 0.3)`
           };
         } else {
           return {
@@ -280,10 +280,10 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
             backdropFilter: 'blur(12px) saturate(1.8) brightness(1.1)',
             WebkitBackdropFilter: 'blur(12px) saturate(1.8) brightness(1.1)',
             border: '1px solid rgba(255, 255, 255, 0.3)',
-            boxShadow: \`0 8px 32px 0 rgba(31, 38, 135, 0.2),
+            boxShadow: `0 8px 32px 0 rgba(31, 38, 135, 0.2),
                         0 2px 16px 0 rgba(31, 38, 135, 0.1),
                         inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
-                        inset 0 -1px 0 0 rgba(255, 255, 255, 0.2)\`
+                        inset 0 -1px 0 0 rgba(255, 255, 255, 0.2)`
           };
         }
       }
@@ -300,7 +300,7 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   return (
     <div
       ref={containerRef}
-      className={\`\${glassSurfaceClasses} \${focusVisibleClasses} \${className}\`}
+      className={`${glassSurfaceClasses} ${focusVisibleClasses} ${className}`}
       style={getContainerStyles()}
       onClick={onClick}
     >
