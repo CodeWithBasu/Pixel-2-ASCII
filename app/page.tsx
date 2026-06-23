@@ -5,6 +5,7 @@ import { useState, useRef, useCallback, useEffect } from "react"
 import { VideoToAsciiConverter } from "@/components/video-to-ascii-converter"
 import { ImageToAsciiConverter } from "@/components/image-to-ascii-converter"
 import { TerminalHeader } from "@/components/terminal-header"
+import GlassSurface from "@/components/GlassSurface"
 import Lightfall from "@/components/Lightfall"
 import { motion, AnimatePresence } from "framer-motion"
 import { Github, Twitter, Linkedin, Heart, Coffee } from "lucide-react"
@@ -141,27 +142,43 @@ export default function HomePage() {
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                >
-                  <div 
-                    className={`border border-white/10 bg-black/40 backdrop-blur-md hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between group ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}
+                  <GlassSurface
+                    width="100%"
+                    height="100%"
+                    borderRadius={0}
+                    borderWidth={0}
+                    blur={15}
+                    backgroundOpacity={0.1}
+                    className="cursor-pointer group"
                     onClick={() => imageInputRef.current?.click()}
                   >
-                    <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">01 // Format</div>
-                    <div>
-                      <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold tracking-tighter uppercase mb-2">Image</h3>
-                      <p className="text-[10px] font-mono text-zinc-600 group-hover:text-black transition-colors">PNG . JPG . WEBP</p>
+                    <div className={`border border-white/10 hover:border-white hover:bg-white hover:text-black transition-colors duration-300 flex flex-col justify-between h-full w-full ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}>
+                      <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">01 // Format</div>
+                      <div>
+                        <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold tracking-tighter uppercase mb-2">Image</h3>
+                        <p className="text-[10px] font-mono text-zinc-600 group-hover:text-black transition-colors">PNG . JPG . WEBP</p>
+                      </div>
                     </div>
-                  </div>
+                  </GlassSurface>
                   
-                  <div 
-                    className={`border border-white/10 bg-black/40 backdrop-blur-md hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between group ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}
+                  <GlassSurface
+                    width="100%"
+                    height="100%"
+                    borderRadius={0}
+                    borderWidth={0}
+                    blur={15}
+                    backgroundOpacity={0.1}
+                    className="cursor-pointer group"
                     onClick={() => videoInputRef.current?.click()}
                   >
-                    <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">02 // Format</div>
-                    <div>
-                      <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold tracking-tighter uppercase mb-2">Video</h3>
-                      <p className="text-[10px] font-mono text-zinc-600 group-hover:text-black transition-colors">MP4 . WEBM</p>
+                    <div className={`border border-white/10 hover:border-white hover:bg-white hover:text-black transition-colors duration-300 flex flex-col justify-between h-full w-full ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}>
+                      <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">02 // Format</div>
+                      <div>
+                        <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold tracking-tighter uppercase mb-2">Video</h3>
+                        <p className="text-[10px] font-mono text-zinc-600 group-hover:text-black transition-colors">MP4 . WEBM</p>
+                      </div>
                     </div>
-                  </div>
+                  </GlassSurface>
                </div>
 
                <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
