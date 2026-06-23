@@ -128,7 +128,7 @@ export default function HomePage() {
               className="flex-1 flex flex-col items-center justify-between w-full max-w-6xl mx-auto py-8 px-4"
             >
                <div className="text-center space-y-3 w-full mix-blend-difference mb-8">
-                  <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter uppercase leading-[0.8] mb-2">
+                  <h1 className="text-5xl sm:text-7xl md:text-8xl xl:text-9xl font-black tracking-tighter uppercase leading-[0.95] mb-2">
                     Ascii<br />Generator
                   </h1>
                   <p className="text-[10px] sm:text-xs md:text-base text-zinc-500 font-mono tracking-[0.3em] uppercase max-w-xs sm:max-w-md mx-auto opacity-60">
@@ -142,7 +142,7 @@ export default function HomePage() {
                   onDragOver={handleDragOver}
                >
                   <div 
-                    className="p-6 md:p-8 border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between aspect-video group"
+                    className="p-6 md:p-8 border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between h-48 md:h-56 group"
                     onClick={() => imageInputRef.current?.click()}
                   >
                     <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">01 // Format</div>
@@ -153,7 +153,7 @@ export default function HomePage() {
                   </div>
                   
                   <div 
-                    className="p-6 md:p-8 border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between aspect-video group"
+                    className="p-6 md:p-8 border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between h-48 md:h-56 group"
                     onClick={() => videoInputRef.current?.click()}
                   >
                     <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">02 // Format</div>
