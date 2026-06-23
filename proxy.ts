@@ -6,7 +6,7 @@ const secret = new TextEncoder().encode(
   process.env.JWT_SECRET || "fallback_secret_change_me"
 );
 
-export async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const token = request.cookies.get('auth_token')?.value;
 
   // Protect Admin dashboard & API
