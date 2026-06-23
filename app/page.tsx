@@ -142,7 +142,7 @@ export default function HomePage() {
                   onDragOver={handleDragOver}
                >
                   <div 
-                    className={`border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between group ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}
+                    className={`border border-white/10 bg-black/40 backdrop-blur-md hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between group ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}
                     onClick={() => imageInputRef.current?.click()}
                   >
                     <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">01 // Format</div>
@@ -153,7 +153,7 @@ export default function HomePage() {
                   </div>
                   
                   <div 
-                    className={`border border-white/10 bg-black hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between group ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}
+                    className={`border border-white/10 bg-black/40 backdrop-blur-md hover:border-white hover:bg-white hover:text-black transition-colors duration-300 cursor-pointer flex flex-col justify-between group ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}
                     onClick={() => videoInputRef.current?.click()}
                   >
                     <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">02 // Format</div>

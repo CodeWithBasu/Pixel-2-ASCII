@@ -51,7 +51,7 @@ export function TerminalHeader() {
   }
 
   return (
-    <header className="border-b border-white/10 bg-black relative z-50">
+    <header className="border-b border-white/10 bg-black/40 backdrop-blur-md relative z-50">
       <div className="container mx-auto px-4 md:px-8 py-4 md:py-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-4 text-white font-black tracking-tighter text-3xl uppercase hover:opacity-80 transition-opacity">
