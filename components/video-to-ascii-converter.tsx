@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { X, Video, Play, Square, Download, RefreshCw, CloudUpload } from "lucide-react"
 import { toast } from "sonner"
 import { useResponsive } from "@/hooks/use-responsive"
@@ -12,7 +13,17 @@ interface VideoToAsciiConverterProps {
   onReset: () => void
 }
 
-const ASCII_CHARS = " .:-=+*#%@"
+const CHARACTER_SETS = {
+  standard: " .:-=+*#%@",
+  blocks: " ░▒▓█",
+  minimal: " .:",
+  detailed: "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ",
+  binary: " 01",
+  hex: " 0123456789ABCDEF",
+  moons: " 🌑🌒🌓🌔🌕",
+}
+
+type CharSetKey = keyof typeof CHARACTER_SETS
 
 export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConverterProps) {
   const { isMobile, isTablet } = useResponsive()
@@ -24,11 +35,14 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
   const [width, setWidth] = useState([isMobile ? 40 : isTablet ? 60 : 80])
   const [viewMode, setViewMode] = useState<"controls" | "render">("render")
   const [fps, setFps] = useState([12])
+  const [charSet, setCharSet] = useState<CharSetKey>("standard")
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const intervalRef = useRef<NodeJS.Timeout>()
 
-  const convertFrameToAscii = useCallback((imageData: ImageData, width: number) => {
+  const convertFrameToAscii = useCallback((imageData: ImageData, width: number, charSetKey: CharSetKey) => {
+    const chars = CHARACTER_SETS[charSetKey]
+    const charArray = Array.from(chars)
     const { data } = imageData
     const height = Math.floor((imageData.height * width) / imageData.width * 0.55) // Keep aspect ratio compensation
     let ascii = ""
@@ -44,8 +58,8 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
         const b = data[index + 2]
         const brightness = (r + g + b) / 3
 
-        const charIndex = Math.floor((brightness / 255) * (ASCII_CHARS.length - 1))
-        ascii += ASCII_CHARS[charIndex]
+        const charIndex = Math.floor((brightness / 255) * (charArray.length - 1))
+        ascii += charArray[charIndex]
       }
       ascii += "\n"
     }
@@ -132,7 +146,7 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
       ctx.drawImage(video, 0, 0)
 
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
-      const asciiFrame = convertFrameToAscii(imageData, width[0])
+      const asciiFrame = convertFrameToAscii(imageData, width[0], charSet)
       frames.push(asciiFrame)
 
       setProgress(Math.floor((i / frameCount) * 100))
@@ -142,7 +156,7 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
     }
 
     processFrame(0)
-  }, [convertFrameToAscii, width, fps, stopAsciiVideo])
+  }, [convertFrameToAscii, width, fps, stopAsciiVideo, charSet])
 
   useEffect(() => {
     return () => {
@@ -219,10 +233,11 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
         const g = imageData.data[index+1]
         const b = imageData.data[index+2]
         const avg = (r + g + b) / 3
-        const charIndex = Math.floor((avg / 255) * (ASCII_CHARS.length - 1))
+        const charArray = Array.from(CHARACTER_SETS[charSet])
+        const charIndex = Math.floor((avg / 255) * (charArray.length - 1))
         
         row.push({ 
-          char: ASCII_CHARS[charIndex],
+          char: charArray[charIndex],
           color: `rgb(${r},${g},${b})`
         })
       }
@@ -303,6 +318,24 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
             </div>
 
             <div className="space-y-3">
+                <div className="text-xs uppercase tracking-widest font-mono text-muted-foreground">Character Dictionary</div>
+                <Select value={charSet} onValueChange={(v: CharSetKey) => setCharSet(v)} disabled={isProcessing}>
+                  <SelectTrigger className="bg-background/80 border-border font-mono text-sm h-10 rounded-none shadow-none focus:ring-1 focus:ring-primary/50">
+                    <SelectValue placeholder="Select set" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border-border rounded-none">
+                    <SelectItem value="standard" className="rounded-none cursor-pointer">Standard <span className="text-primary/50 ml-2">.:-=+*#%@</span></SelectItem>
+                    <SelectItem value="detailed" className="rounded-none cursor-pointer">Detailed <span className="text-primary/50 ml-2">70+ chars</span></SelectItem>
+                    <SelectItem value="blocks" className="rounded-none cursor-pointer">Blocks <span className="text-primary/50 ml-2">░▒▓█</span></SelectItem>
+                    <SelectItem value="minimal" className="rounded-none cursor-pointer">Minimal <span className="text-primary/50 ml-2">.:</span></SelectItem>
+                    <SelectItem value="binary" className="rounded-none cursor-pointer">Binary <span className="text-primary/50 ml-2">01</span></SelectItem>
+                    <SelectItem value="hex" className="rounded-none cursor-pointer">Hex <span className="text-primary/50 ml-2">0-F</span></SelectItem>
+                    <SelectItem value="moons" className="rounded-none cursor-pointer">Moons <span className="text-primary/50 ml-2">🌑-🌕</span></SelectItem>
+                  </SelectContent>
+                </Select>
+            </div>
+
+            <div className="space-y-3">
                 <div className="flex justify-between items-center text-xs uppercase tracking-widest font-mono text-muted-foreground">
                     <span>Target Extraction fps</span>
                     <span className="text-primary">{fps[0]} fps</span>
@@ -343,6 +376,7 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
                 onClick={() => {
                    setWidth([80])
                    setFps([12])
+                   setCharSet("standard")
                    stopAsciiVideo()
                    setAsciiFrames([])
                    setCurrentFrame(0)

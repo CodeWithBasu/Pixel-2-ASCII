@@ -19,6 +19,9 @@ const CHARACTER_SETS = {
   blocks: " ░▒▓█",
   minimal: " .:",
   detailed: "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ",
+  binary: " 01",
+  hex: " 0123456789ABCDEF",
+  moons: " 🌑🌒🌓🌔🌕",
 }
 
 type CharSetKey = keyof typeof CHARACTER_SETS
@@ -92,6 +95,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
         const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight)
         const { data } = imageData
       const chars = CHARACTER_SETS[charSet]
+      const charArray = Array.from(chars)
       const result: { char: string; color?: string }[][] = []
 
       for (let y = 0; y < targetHeight; y++) {
@@ -112,8 +116,8 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
           let avg = (r + g + b) / 3
           if (invert) avg = 255 - avg
 
-          const charIndex = Math.floor((avg / 255) * (chars.length - 1))
-          const char = chars[charIndex]
+          const charIndex = Math.floor((avg / 255) * (charArray.length - 1))
+          const char = charArray[charIndex]
 
           if (grayscale) {
             row.push({ char })
@@ -366,6 +370,9 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
                     <SelectItem value="detailed" className="rounded-none cursor-pointer">Detailed <span className="text-primary/50 ml-2">70+ chars</span></SelectItem>
                     <SelectItem value="blocks" className="rounded-none cursor-pointer">Blocks <span className="text-primary/50 ml-2">░▒▓█</span></SelectItem>
                     <SelectItem value="minimal" className="rounded-none cursor-pointer">Minimal <span className="text-primary/50 ml-2">.:</span></SelectItem>
+                    <SelectItem value="binary" className="rounded-none cursor-pointer">Binary <span className="text-primary/50 ml-2">01</span></SelectItem>
+                    <SelectItem value="hex" className="rounded-none cursor-pointer">Hex <span className="text-primary/50 ml-2">0-F</span></SelectItem>
+                    <SelectItem value="moons" className="rounded-none cursor-pointer">Moons <span className="text-primary/50 ml-2">🌑-🌕</span></SelectItem>
                   </SelectContent>
                 </Select>
             </div>
