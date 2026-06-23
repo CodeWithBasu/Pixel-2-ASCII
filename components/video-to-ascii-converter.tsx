@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { X, Video, Play, Square, Download, RefreshCw, CloudUpload } from "lucide-react"
+import { X, Video, Play, Square, Download, RefreshCw, CloudUpload, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 import { useResponsive } from "@/hooks/use-responsive"
 
@@ -39,6 +39,16 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const intervalRef = useRef<NodeJS.Timeout>()
+
+  const handleResetParams = useCallback(() => {
+    setWidth([isMobile ? 40 : isTablet ? 60 : 80])
+    setFps([12])
+    setCharSet("standard")
+    setIsPlaying(false)
+    if (intervalRef.current) clearInterval(intervalRef.current)
+    setAsciiFrames([])
+    setCurrentFrame(0)
+  }, [isMobile, isTablet])
 
   const convertFrameToAscii = useCallback((imageData: ImageData, width: number, charSetKey: CharSetKey) => {
     const chars = CHARACTER_SETS[charSetKey]
@@ -373,14 +383,7 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
 
             <Button 
                 variant="ghost" 
-                onClick={() => {
-                   setWidth([80])
-                   setFps([12])
-                   setCharSet("standard")
-                   stopAsciiVideo()
-                   setAsciiFrames([])
-                   setCurrentFrame(0)
-                }}
+                onClick={handleResetParams}
                 className="w-full h-8 text-[9px] tracking-[0.2em] text-white/30 hover:text-white hover:bg-white/5 border border-white/5 rounded-none mt-4 transition-all"
             >
                 CLEAR_BUFFER_&_RESET_SYSTEM
@@ -409,6 +412,9 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
         {/* Viewport Header */}
         <div className="h-10 bg-black border-b border-white/10 flex items-center justify-between px-4 sticky top-0 z-20">
             <div className="flex gap-4">
+                <Button variant="ghost" size="sm" onClick={onReset} className="h-6 px-2 rounded-none text-[10px] font-mono tracking-widest text-white/40 hover:bg-white hover:text-black transition-colors hidden md:flex">
+                   <ArrowLeft className="w-3 h-3 mr-2" /> BACK
+                </Button>
                 <div className="flex gap-1.5 items-center">
                    <div className={`w-2 h-2 ${isPlaying ? 'bg-white' : 'bg-white/20'}`}></div>
                    <div className={`w-2 h-2 ${isPlaying ? 'bg-white' : 'bg-white/40'}`}></div>
@@ -418,9 +424,14 @@ export function VideoToAsciiConverter({ videoFile, onReset }: VideoToAsciiConver
                     {asciiFrames.length > 0 ? `SEQ_${currentFrame + 1}/${asciiFrames.length}` : 'AWAITING_DATA'}
                 </div>
             </div>
-            <div className="text-[10px] font-mono tracking-widest text-muted-foreground">
-                <span className="opacity-50 mr-2">{videoFile.name} //</span>
-                {videoRef.current ? `${videoRef.current.duration.toFixed(1)}s` : '0.0s'}
+            <div className="flex items-center gap-4">
+                <div className="text-[10px] font-mono tracking-widest text-muted-foreground hidden md:block">
+                    <span className="opacity-50 mr-2">{videoFile.name} //</span>
+                    {videoRef.current ? `${videoRef.current.duration.toFixed(1)}s` : '0.0s'}
+                </div>
+                <Button size="icon" variant="ghost" onClick={handleResetParams} disabled={isProcessing} className="h-6 w-6 rounded-none hover:bg-white text-white/40 hover:text-black group transition-colors">
+                    <RefreshCw className={`h-3 w-3 ${isProcessing ? "animate-spin text-white group-hover:text-black" : "group-hover:text-black"}`} />
+                </Button>
             </div>
         </div>
         

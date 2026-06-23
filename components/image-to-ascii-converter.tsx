@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Copy, Download, Share2, RefreshCw, X, Image as ImageIcon, CloudUpload } from "lucide-react"
+import { Copy, Download, Share2, RefreshCw, X, Image as ImageIcon, CloudUpload, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 import { useResponsive } from "@/hooks/use-responsive"
 
@@ -49,6 +49,16 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
       setWidth([targetWidth])
     }
   }, [isMobile, isTablet])
+
+  const handleResetParams = useCallback(() => {
+    setWidth([120])
+    setCharSet("standard")
+    setInvert(false)
+    setGrayscale(false)
+    setEdgeDetect(false)
+    setContrast([20])
+    setBrightness([0])
+  }, [])
 
   const processImage = useCallback(() => {
     if (!loadedImage) return
@@ -420,15 +430,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
 
             <Button 
               variant="ghost" 
-              onClick={() => {
-                setWidth([120])
-                setCharSet("standard")
-                setInvert(false)
-                setGrayscale(false)
-                setEdgeDetect(false)
-                setContrast([20])
-                setBrightness([0])
-              }}
+              onClick={handleResetParams}
               className="w-full h-8 text-[9px] tracking-[0.2em] text-white/30 hover:text-white hover:bg-white/5 border border-white/5 rounded-none mt-4 transition-all"
             >
               RESET_PARAMETERS_TO_DEFAULT
@@ -457,6 +459,9 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
         {/* Viewport Header */}
         <div className="h-10 bg-black border-b border-white/10 flex items-center justify-between px-4 sticky top-0 z-20">
             <div className="flex gap-4">
+                <Button variant="ghost" size="sm" onClick={onReset} className="h-6 px-2 rounded-none text-[10px] font-mono tracking-widest text-white/40 hover:bg-white hover:text-black transition-colors hidden md:flex">
+                   <ArrowLeft className="w-3 h-3 mr-2" /> BACK
+                </Button>
                 <div className="flex gap-1.5 items-center">
                   <div className="w-2 h-2 bg-white/40"></div>
                   <div className="w-2 h-2 bg-white/60"></div>
@@ -464,7 +469,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
                 </div>
                 <div className="text-[10px] font-mono tracking-widest uppercase text-white/40">Viewport_1 // Render Target</div>
             </div>
-            <Button size="icon" variant="ghost" onClick={processImage} disabled={isProcessing} className="h-6 w-6 rounded-none hover:bg-white text-white/40 hover:text-black group transition-colors">
+            <Button size="icon" variant="ghost" onClick={handleResetParams} disabled={isProcessing} className="h-6 w-6 rounded-none hover:bg-white text-white/40 hover:text-black group transition-colors">
                 <RefreshCw className={`h-3 w-3 ${isProcessing ? "animate-spin text-white group-hover:text-black" : "group-hover:text-black"}`} />
             </Button>
         </div>
