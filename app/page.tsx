@@ -5,7 +5,7 @@ import { useState, useRef, useCallback, useEffect } from "react"
 import { VideoToAsciiConverter } from "@/components/video-to-ascii-converter"
 import { ImageToAsciiConverter } from "@/components/image-to-ascii-converter"
 import { TerminalHeader } from "@/components/terminal-header"
-import { Meteors } from "@/components/meteors"
+import Lightfall from "@/components/Lightfall"
 import { motion, AnimatePresence } from "framer-motion"
 import { Github, Twitter, Linkedin, Heart, Coffee } from "lucide-react"
 import { useResponsive } from "@/hooks/use-responsive"
@@ -109,8 +109,8 @@ export default function HomePage() {
         )}
       </AnimatePresence>
 
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-80">
-         <Meteors number={35} />
+      <div className="fixed inset-0 z-0 opacity-80">
+        <Lightfall colors={['#A6C8FF', '#5227FF', '#FF9FFC']} backgroundColor="#0A29FF" speed={1} streakCount={8} streakWidth={1} streakLength={1} glow={1} density={1} twinkle={1} zoom={2} backgroundGlow={1} opacity={1} mouseInteraction={true} mouseStrength={1} mouseRadius={0.6} />
       </div>
       
       <div className="relative z-10 flex flex-col h-full w-full overflow-y-auto md:overflow-hidden lg:max-w-7xl lg:mx-auto">

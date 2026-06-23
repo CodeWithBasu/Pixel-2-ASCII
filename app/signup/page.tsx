@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { TerminalHeader } from "@/components/terminal-header"
-import { Meteors } from "@/components/meteors"
+import Lightfall from "@/components/Lightfall"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -44,8 +44,8 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen w-screen bg-black text-white font-sans flex flex-col relative overflow-hidden">
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-40">
-        <Meteors number={10} />
+      <div className="fixed inset-0 z-0 opacity-40">
+        <Lightfall colors={['#A6C8FF', '#5227FF', '#FF9FFC']} backgroundColor="#0A29FF" speed={1} streakCount={8} streakWidth={1} streakLength={1} glow={1} density={1} twinkle={1} zoom={2} backgroundGlow={1} opacity={1} mouseInteraction={true} mouseStrength={1} mouseRadius={0.6} />
       </div>
 
       <div className="relative z-10 flex flex-col h-full w-full lg:max-w-7xl lg:mx-auto">

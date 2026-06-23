@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { TerminalHeader } from "@/components/terminal-header"
-import { Meteors } from "@/components/meteors"
+import Lightfall from "@/components/Lightfall"
 import { motion, AnimatePresence } from "framer-motion"
 import { RefreshCw, ArrowLeft } from "lucide-react"
 import Link from "next/link"
@@ -44,9 +44,9 @@ export default function GalleryPage() {
 
   return (
     <div className="min-h-screen w-screen bg-black text-white font-sans flex flex-col relative overflow-x-hidden">
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-40">
+      <div className="fixed inset-0 z-0 opacity-40">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(20,20,20,1)_0%,rgba(0,0,0,1)_100%)]"></div>
-        <Meteors number={15} />
+        <Lightfall colors={['#A6C8FF', '#5227FF', '#FF9FFC']} backgroundColor="#0A29FF" speed={1} streakCount={8} streakWidth={1} streakLength={1} glow={1} density={1} twinkle={1} zoom={2} backgroundGlow={1} opacity={1} mouseInteraction={true} mouseStrength={1} mouseRadius={0.6} />
       </div>
 
       <div className="relative z-10 flex flex-col h-full w-full lg:max-w-7xl lg:mx-auto">
