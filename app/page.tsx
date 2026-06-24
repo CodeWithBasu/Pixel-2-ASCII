@@ -11,7 +11,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Github, Twitter, Linkedin, Heart, Coffee } from "lucide-react"
 import { useResponsive } from "@/hooks/use-responsive"
 import DynamicTextSlider from "@/components/ui/dynamic-text-slider"
-import SearchComponent from "@/components/ui/animated-glowing-search-bar"
+import AnimatedGlowingBorder from "@/components/ui/animated-glowing-border"
 
 export default function HomePage() {
   const [videoFile, setVideoFile] = useState<File | null>(null)
@@ -142,49 +142,39 @@ export default function HomePage() {
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                >
-                  <GlassSurface
-                    width="100%"
-                    height="100%"
-                    borderRadius={0}
-                    borderWidth={0}
-                    blur={15}
-                    backgroundOpacity={0.1}
-                    className="cursor-pointer group"
-                    onClick={() => imageInputRef.current?.click()}
-                  >
-                    <div className={`border border-white/10 hover:border-white hover:bg-white hover:text-black transition-colors duration-300 flex flex-col justify-between h-full w-full ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}>
-                      <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">01 // Format</div>
-                      <div>
-                        <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold tracking-tighter uppercase mb-2">Image</h3>
-                        <p className="text-[10px] font-mono text-zinc-600 group-hover:text-black transition-colors">PNG . JPG . WEBP</p>
+                  <AnimatedGlowingBorder>
+                    <GlassSurface 
+                      backgroundOpacity={0.1}
+                      className="cursor-pointer group w-full h-full"
+                      onClick={() => imageInputRef.current?.click()}
+                    >
+                      <div className={`border border-white/10 hover:border-white hover:bg-white hover:text-black transition-colors duration-300 flex flex-col justify-between h-full w-full ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}>
+                        <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">01 // Format</div>
+                        <div>
+                          <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold tracking-tighter uppercase mb-2">Image</h3>
+                          <p className="text-[10px] font-mono text-zinc-600 group-hover:text-black transition-colors">PNG . JPG . WEBP</p>
+                        </div>
                       </div>
-                    </div>
-                  </GlassSurface>
-                  
-                  <GlassSurface
-                    width="100%"
-                    height="100%"
-                    borderRadius={0}
-                    borderWidth={0}
-                    blur={15}
-                    backgroundOpacity={0.1}
-                    className="cursor-pointer group"
-                    onClick={() => videoInputRef.current?.click()}
-                  >
-                    <div className={`border border-white/10 hover:border-white hover:bg-white hover:text-black transition-colors duration-300 flex flex-col justify-between h-full w-full ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}>
-                      <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">02 // Format</div>
-                      <div>
-                        <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold tracking-tighter uppercase mb-2">Video</h3>
-                        <p className="text-[10px] font-mono text-zinc-600 group-hover:text-black transition-colors">MP4 . WEBM</p>
+                    </GlassSurface>
+                  </AnimatedGlowingBorder>
+
+                  <AnimatedGlowingBorder>
+                    <GlassSurface 
+                      backgroundOpacity={0.1}
+                      className="cursor-pointer group w-full h-full"
+                      onClick={() => videoInputRef.current?.click()}
+                    >
+                      <div className={`border border-white/10 hover:border-white hover:bg-white hover:text-black transition-colors duration-300 flex flex-col justify-between h-full w-full ${isShortScreen ? 'p-4 md:p-6 h-32 md:h-40' : 'p-6 md:p-8 h-48 md:h-56'}`}>
+                        <div className="text-[9px] font-mono uppercase tracking-widest text-zinc-600 group-hover:text-black transition-colors">02 // Format</div>
+                        <div>
+                          <h3 className="text-2xl md:text-4xl lg:text-5xl font-bold tracking-tighter uppercase mb-2">Video</h3>
+                          <p className="text-[10px] font-mono text-zinc-600 group-hover:text-black transition-colors">MP4 . WEBM</p>
+                        </div>
                       </div>
-                    </div>
-                  </GlassSurface>
+                    </GlassSurface>
+                  </AnimatedGlowingBorder>
                </div>
                
-               <div className="w-full flex justify-center mt-8 lg:mt-12 z-10">
-                 <SearchComponent />
-               </div>
-
                <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
                <input ref={videoInputRef} type="file" accept="video/*" onChange={handleVideoSelect} className="hidden" />
                
