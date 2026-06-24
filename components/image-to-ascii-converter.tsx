@@ -193,6 +193,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     }
 
     img.onload = () => {
+      if (isCleanedUp) return
       // Downscale to prevent GPU memory limits or canvas crashes on mobile
       const MAX_SIZE = 1200
       let w = img.width
@@ -249,6 +250,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
     }
 
     img.onerror = () => {
+      if (isCleanedUp) return
       toast.error("Engine failed to decode this image format.")
       setIsProcessing(false)
       if (originalUrl) URL.revokeObjectURL(originalUrl)
