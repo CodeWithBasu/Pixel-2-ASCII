@@ -300,7 +300,7 @@ const Lightfall: React.FC<LightfallProps> = ({
       }
     };
     if (mouseInteraction) {
-      canvas.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointermove', onPointerMove as EventListener);
     }
 
     const loop = (t: number) => {
@@ -332,7 +332,7 @@ const Lightfall: React.FC<LightfallProps> = ({
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (mouseInteraction) canvas.removeEventListener('pointermove', onPointerMove);
+      if (mouseInteraction) window.removeEventListener('pointermove', onPointerMove as EventListener);
       ro.disconnect();
       if (canvas.parentElement === container) {
         container.removeChild(canvas);
