@@ -21,7 +21,6 @@ const CHARACTER_SETS = {
   detailed: "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ",
   binary: " 01",
   hex: " 0123456789ABCDEF",
-  moons: " 🌑🌒🌓🌔🌕",
 }
 
 type CharSetKey = keyof typeof CHARACTER_SETS
@@ -384,7 +383,6 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
                     <SelectItem value="minimal" className="rounded-none cursor-pointer">Minimal <span className="text-primary/50 ml-2">.:</span></SelectItem>
                     <SelectItem value="binary" className="rounded-none cursor-pointer">Binary <span className="text-primary/50 ml-2">01</span></SelectItem>
                     <SelectItem value="hex" className="rounded-none cursor-pointer">Hex <span className="text-primary/50 ml-2">0-F</span></SelectItem>
-                    <SelectItem value="moons" className="rounded-none cursor-pointer">Moons <span className="text-primary/50 ml-2">🌑-🌕</span></SelectItem>
                   </SelectContent>
                 </Select>
             </div>
