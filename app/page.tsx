@@ -180,6 +180,10 @@ export default function HomePage() {
                     </div>
                   </GlassSurface>
                </div>
+               
+               <div className="w-full flex justify-center mt-8 lg:mt-12 z-10">
+                 <SearchComponent />
+               </div>
 
                <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />
                <input ref={videoInputRef} type="file" accept="video/*" onChange={handleVideoSelect} className="hidden" />
