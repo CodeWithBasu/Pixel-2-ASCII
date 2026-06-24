@@ -10,6 +10,8 @@ import Lightfall from "@/components/Lightfall"
 import { motion, AnimatePresence } from "framer-motion"
 import { Github, Twitter, Linkedin, Heart, Coffee } from "lucide-react"
 import { useResponsive } from "@/hooks/use-responsive"
+import DynamicTextSlider from "@/components/ui/dynamic-text-slider"
+import SearchComponent from "@/components/ui/animated-glowing-search-bar"
 
 export default function HomePage() {
   const [videoFile, setVideoFile] = useState<File | null>(null)
@@ -129,9 +131,7 @@ export default function HomePage() {
               className={`flex-1 flex flex-col items-center justify-between w-full max-w-6xl mx-auto px-4 transition-all duration-500 ${isShortScreen ? 'py-2' : 'py-8'}`}
             >
                <div className={`text-center w-full mix-blend-difference transition-all duration-500 ${isShortScreen ? 'space-y-1 mb-4' : 'space-y-3 mb-8'}`}>
-                  <h1 className={`font-black tracking-tighter uppercase leading-[0.95] transition-all duration-500 ${isShortScreen ? 'text-4xl sm:text-6xl md:text-7xl xl:text-8xl mb-1' : 'text-5xl sm:text-7xl md:text-8xl xl:text-9xl mb-2'}`}>
-                    Ascii<br />Generator
-                  </h1>
+                  <DynamicTextSlider />
                   <p className="text-[10px] sm:text-xs md:text-base text-zinc-500 font-mono tracking-[0.3em] uppercase max-w-xs sm:max-w-md mx-auto opacity-60">
                     Select a media format to begin.
                   </p>
