@@ -75,7 +75,16 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Secure_Cipher</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Secure_Cipher</label>
+                  <button 
+                    type="button"
+                    onClick={() => toast.info("Cipher reset protocol is currently offline. Contact system administrator.")}
+                    className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest hover:text-white transition-colors"
+                  >
+                    Forgot_Cipher?
+                  </button>
+                </div>
                 <input 
                   type="password" 
                   value={password}
