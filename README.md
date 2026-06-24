@@ -14,7 +14,7 @@
     <a href="#-getting-started">Quick Start</a>
   </p>
 
-  <img src="image.png" alt="ASCII Studio Landing Page" width="100%" style="border-radius: 12px; border: 1px solid #333;" />
+  <img src="public/image.png" alt="ASCII Studio Landing Page" width="100%" style="border-radius: 12px; border: 1px solid #333;" />
 </div>
 
 <br />
@@ -36,8 +36,8 @@
 ## 📸 Interface Previews
 
 <div align="center">
-  <img src="image_1.png" alt="Loading Core" width="49%" style="border-radius: 8px; border: 1px solid #222;" />
-  <img src="image_2.png" alt="Render Viewport" width="49%" style="border-radius: 8px; border: 1px solid #222;" />
+  <img src="public/image_1.png" alt="Loading Core" width="49%" style="border-radius: 8px; border: 1px solid #222;" />
+  <img src="public/image_2.png" alt="Render Viewport" width="49%" style="border-radius: 8px; border: 1px solid #222;" />
 </div>
 
 <br />
