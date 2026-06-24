@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import Link from "next/link"
 
-export default function LoginPage() {
+export default function ResetPasswordPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
@@ -19,7 +19,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/auth/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -28,14 +28,13 @@ export default function LoginPage() {
       const data = await res.json()
 
       if (data.success) {
-        toast.success("Authorization granted. Welcome back.")
-        router.push("/")
-        router.refresh()
+        toast.success("Cipher reset complete. You may now login.")
+        router.push("/login")
       } else {
-        toast.error(data.error || "Uplink failed. Check credentials.")
+        toast.error(data.error || "Uplink failed. Check details.")
       }
     } catch (error) {
-      toast.error("Internal core error during handshake.")
+      toast.error("Internal core error during reset.")
     } finally {
       setLoading(false)
     }
@@ -58,7 +57,10 @@ export default function LoginPage() {
           >
             <div className="mb-10 text-center">
               <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.5em] block mb-2">Security_Protocol</span>
-              <h1 className="text-4xl font-black tracking-tighter uppercase">Initialize_Login</h1>
+              <h1 className="text-4xl font-black tracking-tighter uppercase">Reset_Cipher</h1>
+              <p className="text-xs text-zinc-500 font-mono mt-4 leading-relaxed">
+                Direct override engaged. Enter your uplink email and new cipher.
+              </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -75,15 +77,7 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Secure_Cipher</label>
-                  <Link 
-                    href="/reset-password"
-                    className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest hover:text-white transition-colors"
-                  >
-                    Forgot_Cipher?
-                  </Link>
-                </div>
+                <label className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">New_Secure_Cipher</label>
                 <input 
                   type="password" 
                   value={password}
@@ -99,12 +93,12 @@ export default function LoginPage() {
                 disabled={loading}
                 className="w-full bg-white text-black font-black uppercase tracking-[0.2em] py-4 hover:bg-zinc-200 transition-all disabled:opacity-50"
               >
-                {loading ? "AUTHENTICATING..." : "ENTRY_COMMAND"}
+                {loading ? "PROCESSING..." : "OVERRIDE_CIPHER"}
               </button>
             </form>
 
             <div className="mt-8 text-center text-xs text-zinc-600 font-mono">
-              New node? <Link href="/signup" className="text-white hover:underline underline-offset-4">Register_ID</Link>
+              Remembered your cipher? <Link href="/login" className="text-white hover:underline underline-offset-4">Return_to_Login</Link>
             </div>
           </motion.div>
         </main>
