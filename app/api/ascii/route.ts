@@ -6,6 +6,9 @@ import { getUser } from '@/lib/auth';
 export async function POST(req: Request) {
   try {
     const user = await getUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required. Please login to upload to the cloud.' }, { status: 401 });
+    }
     await connectToDatabase();
     const body = await req.json();
 
@@ -20,7 +23,7 @@ export async function POST(req: Request) {
       asciiText: JSON.stringify(asciiData),
       isColor,
       settings,
-      author: user ? (user as any).name : 'Anonymous'
+      author: (user as any).name
     });
 
     return NextResponse.json({ success: true, id: newArt._id }, { status: 201 });
