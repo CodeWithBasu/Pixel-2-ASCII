@@ -11,7 +11,6 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Github, Twitter, Linkedin, Heart, Coffee } from "lucide-react"
 import { useResponsive } from "@/hooks/use-responsive"
 import DynamicTextSlider from "@/components/ui/dynamic-text-slider"
-import SearchComponent from "@/components/ui/animated-glowing-search-bar"
 
 export default function HomePage() {
   const [videoFile, setVideoFile] = useState<File | null>(null)
@@ -179,10 +178,6 @@ export default function HomePage() {
                       </div>
                     </div>
                   </GlassSurface>
-               </div>
-               
-               <div className="w-full flex justify-center mt-8 lg:mt-12 z-10">
-                 <SearchComponent />
                </div>
 
                <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageSelect} className="hidden" />

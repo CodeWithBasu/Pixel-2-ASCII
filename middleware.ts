@@ -26,22 +26,11 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  // Optional: Protect cloud uploads (POST to /api/ascii)
-  if (request.nextUrl.pathname === '/api/ascii' && request.method === 'POST') {
-    if (!token) {
-      return NextResponse.json({ success: false, error: 'Authorization required' }, { status: 401 });
-    }
-    try {
-      await jwtVerify(token, secret);
-      return NextResponse.next();
-    } catch (e) {
-      return NextResponse.json({ success: false, error: 'Invalid session' }, { status: 401 });
-    }
-  }
+
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*', '/api/ascii'],
+  matcher: ['/admin/:path*', '/api/admin/:path*'],
 };
