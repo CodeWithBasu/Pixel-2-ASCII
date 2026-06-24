@@ -1,53 +1,56 @@
-# 🌌 ASCII Studio
-
 <div align="center">
-  <img src="public/app-icon.png" alt="ASCII Studio Hero" width="200"/>
-  <br/>
-  <strong>A High-Performance Web Application for Digital Artists and Terminal Enthusiasts</strong>
+  <br />
+  <img src="public/app-icon.png" alt="ASCII Studio Logo" width="120" />
+  <br />
+
+  <h1 align="center">🌌 ASCII_STUDIO</h1>
+  
+  <p align="center">
+    <strong>A High-Performance Web Engine for Digital Artists & Terminal Enthusiasts</strong>
+    <br />
+    <br />
+    <a href="#-architecture">Architecture</a> •
+    <a href="#-features">Features</a> •
+    <a href="#-getting-started">Quick Start</a>
+  </p>
+
+  <img src="image.png" alt="ASCII Studio Landing Page" width="100%" style="border-radius: 12px; border: 1px solid #333;" />
 </div>
 
-**ASCII Studio** transforms your images and videos into mesmerizing ASCII matrix art using real-time character-density algorithms. With built-in cloud synchronization, you can archive your transmissions and share them with the local community vault. 
+<br />
 
-Built with mobile-first rendering engines and cinematic UX, ASCII Studio handles complex high-res file processing entirely on edge devices.
+> **ASCII_STUDIO** transforms your images and videos into mesmerizing ASCII matrix art using real-time character-density algorithms. Built with a cinematic, highly-animated UX and heavy edge-rendering, it bypasses standard memory limits to handle complex high-res files directly in your browser.
 
 ---
 
-## ⚡ Key Features
+## ⚡ Core Features
 
 - **🖼️ Image-to-ASCII Engine**: Convert high-resolution images & HEIC files into colored or monochrome character grids using native mobile-optimized off-screen rendering.
 - **🎬 Video-to-ASCII Uplink**: Process video files frame-by-frame on the client side and export them as animated text-based sequences.
 - **☁️ Cloud Buffer Gallery**: Archive your best renders to a MongoDB-powered community gallery with real-time UI states.
 - **🛡️ Registry Protocol**: Secure user authentication (JWT + JOSE) with persistent edge sessions.
-- **🖥️ Admin Override**: Specialized dashboard for vault management and transmission purging.
 - **📱 Responsive PWA Ready**: Install as a standalone web app for a desktop-like experience on iOS & Android.
+
+<br />
+
+## 📸 Interface Previews
+
+<div align="center">
+  <img src="image_1.png" alt="Loading Core" width="49%" style="border-radius: 8px; border: 1px solid #222;" />
+  <img src="image_2.png" alt="Render Viewport" width="49%" style="border-radius: 8px; border: 1px solid #222;" />
+</div>
+
+<br />
 
 ---
 
 ## 🏗️ System Architecture
 
-ASCII Studio employs a modern, serverless Next.js App Router architecture with strict edge-client boundaries.
+ASCII Studio employs a modern, serverless **Next.js App Router** architecture with strict edge-client boundaries to maximize performance.
 
-```mermaid
-graph TD
-    Client[📱 Client Browser<br>React/Tailwind] --> |Image/Video Data| Renderer(⚙️ Client Engine<br>Memory Canvas / toBlob)
-    Renderer --> |Generate| ASCII[🌌 ASCII Matrix Data]
-    
-    Client -->|API Requests| API[⚡ Next.js API Routes]
-    API --> |Edge Auth| JWT(🛡️ JWT Middleware)
-    
-    JWT --> |Write/Read| DB[(💾 MongoDB Atlas)]
-    
-    style Client fill:#000000,stroke:#333,stroke-width:2px,color:#fff
-    style Renderer fill:#111111,stroke:#00ffcc,stroke-width:2px,color:#fff
-    style ASCII fill:#111111,stroke:#ffffff,stroke-width:2px,color:#fff
-    style API fill:#000000,stroke:#333,stroke-width:2px,color:#fff
-    style JWT fill:#111111,stroke:#333,stroke-width:2px,color:#fff
-    style DB fill:#001100,stroke:#00ff00,stroke-width:2px,color:#fff
-```
+### 🔄 Core Workflow Engine
 
-## 🔄 Core Workflow Engine
-
-The conversion workflow is built to bypass mobile memory (`RAM`) crashing limits natively:
+The conversion workflow is built to bypass mobile memory (`RAM`) crashing limits natively using offscreen canvases:
 
 ```mermaid
 sequenceDiagram
@@ -71,75 +74,94 @@ sequenceDiagram
     end
 ```
 
----
+### 🗄️ Application Topology
 
-## 📂 Project Structure
-
-```text
-Pixel-2-ASCII/
-├── app/                  # Next.js App Router Pages & Layouts
-│   ├── api/              # Serverless API Endpoints (Auth, Gallery)
-│   ├── admin/            # Secure Admin Dashboard
-│   ├── gallery/          # Public Community Vault
-│   └── page.tsx          # Main Entry & Cinematic Splash
-├── components/           # React Functional Components
-│   ├── image-to-ascii-converter.tsx  # Core Image Engine
-│   └── video-to-ascii-converter.tsx  # Core Video Engine
-├── hooks/                # Custom React Hooks (use-responsive, etc)
-├── lib/                  # Utilities & Auth Handlers (JOSE/JWT)
-├── models/               # Mongoose DB Schemas
-├── public/               # Static Assets & PWA Manifest
-└── tailwind.config.ts    # Styling Rules & Animations
+```mermaid
+graph TD
+    Client[📱 Client Browser<br>React/Tailwind] --> |Media Data| Renderer(⚙️ Client Engine<br>Memory Canvas / toBlob)
+    Renderer --> |Generate| ASCII[🌌 ASCII Matrix Data]
+    
+    Client -->|API Requests| API[⚡ Next.js API Routes]
+    API --> |Edge Auth| JWT(🛡️ JWT Middleware)
+    
+    JWT --> |Write/Read| DB[(💾 MongoDB Atlas)]
+    
+    style Client fill:#050505,stroke:#333,stroke-width:2px,color:#fff
+    style Renderer fill:#111,stroke:#5227FF,stroke-width:2px,color:#fff
+    style ASCII fill:#111,stroke:#cf30aa,stroke-width:2px,color:#fff
+    style API fill:#050505,stroke:#333,stroke-width:2px,color:#fff
+    style JWT fill:#111,stroke:#333,stroke-width:2px,color:#fff
+    style DB fill:#051105,stroke:#00ff00,stroke-width:2px,color:#fff
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## 💻 Code Snippets
 
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
-- **Library**: [React 19](https://react.dev/) + [Framer Motion 12](https://www.framer.com/motion/)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **Database**: [MongoDB Atlas](https://www.mongodb.com/atlas) + [Mongoose](https://mongoosejs.com/)
-- **Auth**: [JWT](https://jwt.io/) + [JOSE](https://github.com/panva/jose)
-- **Format Decoders**: [heic2any](https://github.com/alexcorvi/heic2any)
+### ⚙️ Core Character Mapping Algorithm
+The engine converts RGBA pixel data into ASCII characters based on luminance calculations:
+
+```typescript
+const asciiChars = " .:-=+*#%@"; // Density mapping
+
+// Calculate relative luminance for a pixel
+const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+// Map luminance to character index
+const charIndex = Math.floor(luminance * (asciiChars.length - 1));
+const asciiChar = asciiChars[charIndex];
+```
+
+### 🔒 Edge Authentication Middleware
+Protecting API routes with `jose` at the Edge:
+
+```typescript
+import { jwtVerify } from 'jose'
+
+export async function middleware(request: NextRequest) {
+  const token = request.cookies.get('token')?.value
+
+  if (!token) {
+    return NextResponse.json({ error: 'Uplink unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET)
+    await jwtVerify(token, secret)
+    return NextResponse.next()
+  } catch (error) {
+    return NextResponse.json({ error: 'Token synchronization failed' }, { status: 401 })
+  }
+}
+```
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Clone the Node
+### Prerequisites
+- Node.js `18.x` or higher
+- MongoDB Atlas Cluster URl
+
+### Local Deployment
 ```bash
+# 1. Clone the repository
 git clone https://github.com/CodeWithBasu/Pixel-2-ASCII.git
-cd Pixel-2-ASCII
-```
 
-### 2. Initialize Dependencies
-```bash
+# 2. Install dependencies
 npm install
-```
 
-### 3. Configure the Grid (.env.local)
-Create a `.env.local` file in the root and configure your uplink credentials:
-```env
-MONGODB_URI=your_mongodb_atlas_uri
-JWT_SECRET=your_secure_random_key
-ADMIN_EMAIL=your_admin_email@domain.com
-```
+# 3. Setup environment variables
+cp .env.example .env.local
 
-### 4. Boot System
-```bash
+# 4. Initialize the dev server
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) to begin.
+
+Visit `http://localhost:3000` to enter the studio.
 
 ---
 
-## 📜 Admin Protocols
-To unlock the **Admin Override** console:
-1. Register a new ID using the `ADMIN_EMAIL` specified in your `.env.local`.
-2. Access the specialized dashboard at `/admin`.
-
----
-
-## 📄 License
-Created with ☕ and passion by **Basudev**. All transmissions are public under the MIT License.
+<div align="center">
+  <p>Built with 🤍 by <strong>Basudev</strong></p>
+</div>
