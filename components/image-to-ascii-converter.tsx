@@ -350,7 +350,7 @@ export function ImageToAsciiConverter({ imageFile, onReset }: ImageToAsciiConver
       )}
 
       {/* Sidebar Controls - HUD style */}
-      <aside className={`${isMobile && viewMode !== 'controls' ? 'hidden' : 'flex'} w-full md:w-80 lg:w-96 shrink-0 bg-black/40 backdrop-blur-md flex flex-col h-auto md:h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/10 uppercase tracking-tighter`}>
+      <aside className={`${isMobile && viewMode !== 'controls' ? 'hidden' : 'flex'} w-full md:w-80 lg:w-96 shrink-0 bg-black/40 backdrop-blur-md flex flex-col flex-1 min-h-0 md:flex-none md:h-full overflow-y-auto custom-scrollbar p-6 border-r border-white/10 uppercase tracking-tighter`}>
         <div className="flex items-center justify-between mb-10">
             <div className="flex items-center gap-3 text-white">
                 <ImageIcon className="w-5 h-5"/>

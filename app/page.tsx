@@ -75,7 +75,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-black text-white selection:bg-white selection:text-black font-sans flex flex-col relative">
+    <div className="h-[100dvh] w-screen overflow-hidden bg-black text-white selection:bg-white selection:text-black font-sans flex flex-col relative">
       <AnimatePresence>
         {showSplash && (
           <motion.div 
